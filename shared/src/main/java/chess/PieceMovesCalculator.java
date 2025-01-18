@@ -8,4 +8,9 @@ public class PieceMovesCalculator {
     Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         throw new RuntimeException("not implemented");
     }
+
+    @Override
+    public String toString() {
+        return "PieceMovesCalculator{}";
+    }
 }
