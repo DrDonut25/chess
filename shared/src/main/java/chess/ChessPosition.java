@@ -26,6 +26,14 @@ public class ChessPosition {
         return row;
     }
 
+    /**
+     * @return which column this position is in
+     * 1 codes for the left row
+     */
+    public int getColumn() {
+        return col;
+    }
+
     @Override
     public String toString() {
         return "ChessPosition{" +
@@ -50,11 +58,5 @@ public class ChessPosition {
         return Objects.hash(row, col);
     }
 
-    /**
-     * @return which column this position is in
-     * 1 codes for the left row
-     */
-    public int getColumn() {
-        return col;
-    }
+
 }
