@@ -76,28 +76,25 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        ChessPiece piece = board.getPiece(myPosition);
         pieceMovesCalculator movesCalculator;
-        if (piece.getPieceType() == PieceType.KING) {
+        if (this.getPieceType() == PieceType.KING) {
             movesCalculator = new KingMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else if (piece.getPieceType() == PieceType.QUEEN) {
+        } else if (this.getPieceType() == PieceType.QUEEN) {
             movesCalculator = new QueenMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else if (piece.getPieceType() == PieceType.KNIGHT) {
+        } else if (this.getPieceType() == PieceType.KNIGHT) {
             movesCalculator = new KnightMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else if (piece.getPieceType() == PieceType.PAWN) {
+        } else if (this.getPieceType() == PieceType.PAWN) {
             movesCalculator = new PawnMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else if (piece.getPieceType() == PieceType.ROOK) {
+        } else if (this.getPieceType() == PieceType.ROOK) {
             movesCalculator = new RookMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else if (piece.getPieceType() == PieceType.BISHOP) {
+        } else {
             movesCalculator = new BishopMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
-        } else {
-            throw new RuntimeException("no piece at the specified position");
         }
     }
 }
