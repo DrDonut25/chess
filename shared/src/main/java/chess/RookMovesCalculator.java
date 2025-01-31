@@ -45,7 +45,7 @@ public class RookMovesCalculator implements pieceMovesCalculator{
             i--;
             endPos = new ChessPosition(position.getRow(), position.getColumn() + i);
         }
-        //up horizontal
+        //up vertical
         i = 1;
         endPos = new ChessPosition(position.getRow() + i, position.getColumn());
         while (endPos.isValidPosition()) {
@@ -63,7 +63,7 @@ public class RookMovesCalculator implements pieceMovesCalculator{
             i++;
             endPos = new ChessPosition(position.getRow() + i, position.getColumn());
         }
-        //down horizontal
+        //down vertical
         i = -1;
         endPos = new ChessPosition(position.getRow() + i, position.getColumn());
         while (endPos.isValidPosition()) {

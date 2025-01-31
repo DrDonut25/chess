@@ -11,7 +11,6 @@ public class PawnMovesCalculator implements pieceMovesCalculator {
         //pawn can only move forward 1 space unless it's on row 2 (white) or row 7 (black), to which add a second move space
         //forward pawn movements
         if (pawn.getTeamColor() == ChessGame.TeamColor.WHITE) {
-            //check if pawn hasn't moved yet (impossible to promote pawn from starting position
             ChessPosition endPos = new ChessPosition (position.getRow() + 1, position.getColumn());
             //check space in front of pawn (no need to call isValidPosition() because pawns get promoted at last row)
             //check if pawn can reach last row and get promoted
