@@ -1,6 +1,8 @@
 package chess;
 
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -10,15 +12,19 @@ import java.util.Collection;
  */
 public class ChessGame {
 
-    public ChessGame() {
+    private TeamColor teamTurn;
+    private ChessBoard board;
 
+    public ChessGame() {
+        teamTurn = TeamColor.WHITE;
+        board = new ChessBoard();
     }
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        throw new RuntimeException("Not implemented");
+        return teamTurn;
     }
 
     /**
@@ -27,22 +33,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        throw new RuntimeException("Not implemented");
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        return super.equals(obj);
-    }
-
-    @Override
-    public int hashCode() {
-        return super.hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return "ChessGame{}";
+        this.teamTurn = team;
     }
 
     /**
@@ -61,7 +52,18 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        //add valid move check later
+        if (!this.isInCheck(piece.getTeamColor())) {
+            //check if the piece moving will expose the king to check
+            //ADD IF CONDITION HERE
+            return moves;
+        } else {
+            //find moves that can block king and end check, otherwise return empty list
+            //INSERT BLOCK MOVE LOOP HERE
+            return Collections.emptyList();
+        }
     }
 
     /**
@@ -71,7 +73,14 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> moves = this.validMoves(move.getStartPosition());
+        //check if move is valid for piece at starting position, otherwise throw InvalidMoveException
+        if (moves.contains(move)) {
+            //update board to reflect move
+            //ADD BOARD UPDATE CODE HERE
+        } else {
+            throw new InvalidMoveException();
+        }
     }
 
     /**
@@ -81,6 +90,10 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        //2 possible causes of check: enemy piece moves into threatening position, or ally piece moves and exposes king
+        //For latter, call isInCheck during validMoves to keep pieces from exposing king
+        //iterate through every piece on enemy team, then call pieceMoves on each of them
+        //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
         throw new RuntimeException("Not implemented");
     }
 
@@ -111,7 +124,7 @@ public class ChessGame {
      * @param board the new board to use
      */
     public void setBoard(ChessBoard board) {
-        throw new RuntimeException("Not implemented");
+        this.board = board;
     }
 
     /**
@@ -120,6 +133,30 @@ public class ChessGame {
      * @return the chessboard
      */
     public ChessBoard getBoard() {
-        throw new RuntimeException("Not implemented");
+        return board;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof ChessGame chessGame)) {
+            return false;
+        }
+        return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(teamTurn, board);
+    }
+
+    @Override
+    public String toString() {
+        return "ChessGame{" +
+                "teamTurn=" + teamTurn +
+                ", board=" + board +
+                '}';
     }
 }
