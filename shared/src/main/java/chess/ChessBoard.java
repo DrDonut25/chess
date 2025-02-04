@@ -15,6 +15,9 @@ public class ChessBoard {
         squares = new ChessPiece[8][8];
     }
 
+    public ChessBoard(ChessBoard board) { //COPY CONSTRUCTOR
+        this.squares = Arrays.copyOf(board.squares, board.squares.length);
+    }
     /**
      * Adds a chess piece to the chessboard
      *

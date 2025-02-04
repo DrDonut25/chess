@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -20,6 +21,10 @@ public class ChessGame {
         board = new ChessBoard();
     }
 
+    public ChessGame(ChessGame game) {
+        this.teamTurn = game.teamTurn;
+        board = new ChessBoard(game.board);
+    }
     /**
      * @return Which team's turn it is
      */
@@ -53,16 +58,33 @@ public class ChessGame {
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
         ChessPiece piece = board.getPiece(startPosition);
+        if (piece == null) {
+            return null;
+        }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        //add valid move check later
         if (!this.isInCheck(piece.getTeamColor())) {
-            //check if the piece moving will expose the king to check
-            //ADD IF CONDITION HERE
+            //check if the piece moving will expose the king to check (should also account for the king itself moving?)
+            for (ChessMove move: moves) {
+                ChessGame simulation = new ChessGame(this);
+                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+                board.addPiece(move.getStartPosition(), null);
+                if (simulation.isInCheck(piece.getTeamColor())) {
+                    moves.remove(move);
+                }
+            }
             return moves;
         } else {
-            //find moves that can block king and end check, otherwise return empty list
-            //INSERT BLOCK MOVE LOOP HERE
-            return Collections.emptyList();
+            //find/add moves that can block king from check (if piece isn't king) or escape check (if piece is king), otherwise return empty list
+            ArrayList<ChessMove> escapeMoves = new ArrayList<>();
+            for (ChessMove move: moves) {
+                ChessGame simulation = new ChessGame(this);
+                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+                board.addPiece(move.getStartPosition(), null);
+                if (!simulation.isInCheck(piece.getTeamColor())) {
+                    escapeMoves.add(move);
+                }
+            }
+            return escapeMoves;
         }
     }
 
@@ -74,10 +96,16 @@ public class ChessGame {
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
         Collection<ChessMove> moves = this.validMoves(move.getStartPosition());
-        //check if move is valid for piece at starting position, otherwise throw InvalidMoveException
-        if (moves.contains(move)) {
-            //update board to reflect move
-            //ADD BOARD UPDATE CODE HERE
+        //check if move is valid for piece at starting position and if move's starting position has a piece, otherwise throw InvalidMoveException
+        if (board.getPiece(move.getStartPosition()) != null && moves.contains(move)) {
+            //update board to reflect move: set start position to null and end position to piece, and switch teamTurn
+            board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
+            board.addPiece(move.getStartPosition(), null);
+            if (teamTurn == TeamColor.WHITE) {
+                this.setTeamTurn(TeamColor.BLACK);
+            } else {
+                this.setTeamTurn(TeamColor.WHITE);
+            }
         } else {
             throw new InvalidMoveException();
         }
@@ -168,7 +196,7 @@ public class ChessGame {
     public String toString() {
         return "ChessGame{" +
                 "teamTurn=" + teamTurn +
-                ", board=" + board +
+                ", board=" + board.toString() +
                 '}';
     }
 }
