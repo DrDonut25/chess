@@ -90,11 +90,23 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-        //2 possible causes of check: enemy piece moves into threatening position, or ally piece moves and exposes king
-        //For latter, call isInCheck during validMoves to keep pieces from exposing king
         //iterate through every piece on enemy team, then call pieceMoves on each of them
-        //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
-        throw new RuntimeException("Not implemented");
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition position = new ChessPosition(i,j);
+                ChessPiece piece = board.getPiece(position);
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
+                    Collection<ChessMove> moves = piece.pieceMoves(board, position);
+                    for (ChessMove move: moves) {
+                        if (board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(move.getEndPosition()).getTeamColor() == teamColor) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+        return false;
     }
 
     /**
