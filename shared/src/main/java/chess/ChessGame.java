@@ -19,6 +19,7 @@ public class ChessGame {
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
         board = new ChessBoard();
+        board.resetBoard();
     }
 
     public ChessGame(ChessGame game) {
@@ -62,30 +63,19 @@ public class ChessGame {
             return null;
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
-        if (!this.isInCheck(piece.getTeamColor())) {
-            //check if the piece moving will expose the king to check (should also account for the king itself moving?)
-            for (ChessMove move: moves) {
-                ChessGame simulation = new ChessGame(this);
-                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-                board.addPiece(move.getStartPosition(), null);
-                if (simulation.isInCheck(piece.getTeamColor())) {
-                    moves.remove(move);
-                }
+        ArrayList<ChessMove> valMoves = new ArrayList<>();
+        //Check if team is in check. If in check, see if current piece can protect the king
+        //check if the piece moving will expose the king to check
+        for (ChessMove move: moves) {
+            ChessGame simulation = new ChessGame(this);
+            ChessBoard simBoard = simulation.getBoard();
+            simBoard.addPiece(move.getEndPosition(), simBoard.getPiece(move.getStartPosition()));
+            simBoard.addPiece(move.getStartPosition(), null);
+            if (!simulation.isInCheck(piece.getTeamColor())) {
+                valMoves.add(move);
             }
-            return moves;
-        } else {
-            //find/add moves that can block king from check (if piece isn't king) or escape check (if piece is king), otherwise return empty list
-            ArrayList<ChessMove> escapeMoves = new ArrayList<>();
-            for (ChessMove move: moves) {
-                ChessGame simulation = new ChessGame(this);
-                board.addPiece(move.getEndPosition(), board.getPiece(move.getStartPosition()));
-                board.addPiece(move.getStartPosition(), null);
-                if (!simulation.isInCheck(piece.getTeamColor())) {
-                    escapeMoves.add(move);
-                }
-            }
-            return escapeMoves;
         }
+        return valMoves;
     }
 
     /**
@@ -144,7 +134,7 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**
@@ -155,7 +145,7 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        return false;
     }
 
     /**

@@ -16,7 +16,10 @@ public class ChessBoard {
     }
 
     public ChessBoard(ChessBoard board) { //COPY CONSTRUCTOR
-        this.squares = Arrays.copyOf(board.squares, board.squares.length);
+        squares = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++) {
+            squares[i] = Arrays.copyOf(board.squares[i], board.squares[i].length);
+        }
     }
     /**
      * Adds a chess piece to the chessboard
@@ -120,7 +123,9 @@ public class ChessBoard {
         StringBuilder sb = new StringBuilder();
         for (ChessPiece[] row: squares) {
             for (ChessPiece piece : row) {
-                if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+                if (piece == null) {
+                    sb.append("0 ");
+                } else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
                     if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
                         sb.append("P ");
                     } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
@@ -136,19 +141,17 @@ public class ChessBoard {
                     }
                 } else {
                     if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
-                        sb.append("P ");
+                        sb.append("p ");
                     } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
-                        sb.append("R ");
+                        sb.append("r ");
                     } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
-                        sb.append("N ");
+                        sb.append("n ");
                     } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
-                        sb.append("B ");
+                        sb.append("b ");
                     } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
-                        sb.append("Q ");
-                    } else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
-                        sb.append("K ");
+                        sb.append("q ");
                     } else {
-                        sb.append("0 ");
+                        sb.append("k ");
                     }
                 }
             }
