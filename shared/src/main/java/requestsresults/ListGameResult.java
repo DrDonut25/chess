@@ -1,4 +1,8 @@
 package requestsresults;
 
-public record ListGameResult() {
+import model.GameData;
+
+import java.util.ArrayList;
+
+public record ListGameResult(ArrayList<GameData> games) {
 }

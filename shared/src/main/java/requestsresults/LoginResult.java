@@ -1,4 +1,4 @@
 package requestsresults;
 
-public record LoginResult() {
+public record LoginResult(String username, String authToken) {
 }
