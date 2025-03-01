@@ -25,6 +25,6 @@ public class GameService {
     }
 
     public void clearGames() {
-
+        db.clearGames();
     }
 }

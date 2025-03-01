@@ -27,6 +27,7 @@ public class Server {
 
         //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.post("/user", this::register);
+        Spark.delete("/db", this::clear);
         //Spark.init();
 
         Spark.awaitInitialization();
@@ -45,5 +46,11 @@ public class Server {
         RegisterResult registerResult = userService.register(registerRequest);
         response.status(200);
         return serializer.toJson(registerResult);
+    }
+
+    private Response clear(Request request, Response response) {
+        userService.clear();
+        gameService.clearGames();
+        return response;
     }
 }

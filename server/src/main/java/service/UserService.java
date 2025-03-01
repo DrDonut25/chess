@@ -14,7 +14,8 @@ public class UserService {
     }
 
     public void clear() {
-
+        db.clearUsers();
+        db.clearAuths();
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws UserServiceException {
