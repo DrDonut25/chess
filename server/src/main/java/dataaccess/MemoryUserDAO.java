@@ -3,20 +3,25 @@ package dataaccess;
 import model.UserData;
 import service.UserServiceException;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MemoryUserDAO implements UserDAO {
-    private static Database db; //can this be properly updated if it's static? Should it be a pointer object?
+    private Map<String, UserData> users;
 
-    public static void createUser(String username, String password, String email) {
-        //How to update database?
-        UserData user = new UserData(username, password, email);
-        db.addUser(user);
+    public MemoryUserDAO() {
+        users = new HashMap<String, UserData>();
     }
 
-    public static UserData getUser(String username) {
-        return db.getUsers().get(username);
+    public  void createUser(String username, String password, String email) {
+        users.put(username, new UserData(username, password, email));
     }
 
-    public static void clear() {
-        db.clearUsers();
+    public UserData getUser(String username) {
+        return users.get(username);
+    }
+
+    public void clear() {
+        users = new HashMap<String, UserData>();
     }
 }

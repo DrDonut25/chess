@@ -1,7 +1,9 @@
 package server;
 
 import com.google.gson.Gson;
-import dataaccess.Database;
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
+import dataaccess.UserDAO;
 import requestsresults.RegisterRequest;
 import requestsresults.RegisterResult;
 import service.GameService;
@@ -13,9 +15,9 @@ public class Server {
     private UserService userService;
     private GameService gameService;
 
-    public void setMemoryDatabase(Database db) {
-        this.userService = new UserService(db);
-        this.gameService = new GameService(db);
+    public void setServices(AuthDAO authDAO, UserDAO userDAO, GameDAO gameDAO) {
+        this.userService = new UserService(authDAO, userDAO);
+        this.gameService = new GameService(gameDAO);
     }
 
     public int run(int desiredPort) {
@@ -44,7 +46,15 @@ public class Server {
         //Where to place 400/500 exceptions? What exactly causes these errors? How do I avoid sending the wrong exception?
         RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
-        response.status(200);
+        if (registerResult.message() != null) {
+            if (registerResult.message().equals("Error: already taken")) {
+                response.status(403);
+            } else if (registerResult.message().equals("Error: Data Access Exception")) {
+                response.status(500);
+            }
+        } else {
+            response.status(200);
+        }
         return serializer.toJson(registerResult);
     }
 

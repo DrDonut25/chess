@@ -1,13 +1,13 @@
 package service;
 
-import dataaccess.Database;
+import dataaccess.GameDAO;
 import requestsresults.*;
 
 public class GameService {
-    private Database db;
+    private GameDAO gameDAO;
 
-    public GameService(Database db) {
-        this.db = db;
+    public GameService(GameDAO gameDAO) {
+        this.gameDAO = gameDAO;
     }
 
     public ListGameResult listGames(ListGameRequest listGameRequest) {
@@ -25,6 +25,6 @@ public class GameService {
     }
 
     public void clearGames() {
-        db.clearGames();
+        gameDAO.clear();
     }
 }

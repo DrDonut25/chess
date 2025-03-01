@@ -2,27 +2,33 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 public class MemoryAuthDAO implements AuthDAO {
-    private static Database db;
+    private Map<String, AuthData> auths;
 
-    public static String createAuth(String username) {
+    public MemoryAuthDAO() {
+        auths = new HashMap<String, AuthData>();
+    }
+
+    public String createAuth(String username) throws DataAccessException {
         String authToken = generateToken();
-        db.addAuth(new AuthData(username, authToken));
+        auths.put(username, new AuthData(username, authToken));
         return authToken;
     }
 
-    public static String generateToken() {
+    public String generateToken() {
         return UUID.randomUUID().toString();
     }
 
-    public static AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) {
         AuthData authData = null;
         return authData;
     }
 
-    public static void clear() {
-
+    public void clear() {
+        auths = new HashMap<String, AuthData>();
     }
 }

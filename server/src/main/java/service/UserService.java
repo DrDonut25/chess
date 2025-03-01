@@ -1,31 +1,37 @@
 package service;
 
-import dataaccess.Database;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
+import dataaccess.*;
 import model.UserData;
 import requestsresults.*;
 
 public class UserService {
-    private Database db; //do I have to keep on passing this down until I reach a DAO class, then somehow kick it back up the chain?
+    private AuthDAO authDAO; //do I have to keep on passing this down until I reach a DAO class, then somehow kick it back up the chain?
+    private UserDAO userDAO;
 
-    public UserService(Database db) {
-        this.db = db;
+    public UserService(AuthDAO authDAO, UserDAO userDAO) {
+        this.authDAO = authDAO;
+        this.userDAO = userDAO;
     }
 
     public void clear() {
-        db.clearUsers();
-        db.clearAuths();
+        authDAO.clear();
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws UserServiceException {
         String username = registerRequest.username();
+        if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
+            return new RegisterResult(null, null, "Error: bad request");
+        }
         if (MemoryUserDAO.getUser(username) != null) {
-            throw new UserServiceException(403, "Error: already taken");
+            return new RegisterResult(null, null, "Error: already taken");
         }
         MemoryUserDAO.createUser(username, registerRequest.password(), registerRequest.email());
-        String authToken = MemoryAuthDAO.createAuth(username);
-        return new RegisterResult(username, authToken);
+        try {
+            String authToken = authDAO.createAuth(username);
+            return new RegisterResult(username, authToken, null);
+        } catch (DataAccessException e) {
+            return new RegisterResult(null, null, "Error: Data Access Exception");
+        }
     }
     public LoginResult login(LoginRequest loginRequest) throws UserServiceException {
         LoginResult loginResult = null;

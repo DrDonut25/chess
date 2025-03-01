@@ -4,8 +4,11 @@ import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
+import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
+    private Map<Integer, GameData> games;
+
     public static void createGame(AuthData authData) {
 
     }
