@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import requestsresults.*;
 
@@ -24,7 +25,7 @@ public class GameService {
 
     }
 
-    public void clearGames() {
+    public void clear() throws DataAccessException {
         gameDAO.clear();
     }
 }

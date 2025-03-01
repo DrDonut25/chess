@@ -5,27 +5,27 @@ import model.GameData;
 
 public class SQLGameDAO implements GameDAO {
     @Override
-    public void createGame(AuthData auth) {
+    public void createGame(AuthData auth) throws DataAccessException{
 
     }
 
     @Override
-    public GameData getGame(int gameID) {
+    public GameData getGame(int gameID) throws DataAccessException {
         return null;
     }
 
     @Override
-    public GameData[] listGames(AuthData auth) {
+    public GameData[] listGames(AuthData auth) throws DataAccessException {
         return new GameData[0];
     }
 
     @Override
-    public void updateGame(int gameID, String playerColor) {
+    public void updateGame(int gameID, String playerColor) throws DataAccessException {
 
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
 
     }
 }

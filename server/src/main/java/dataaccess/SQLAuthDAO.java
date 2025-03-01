@@ -14,12 +14,12 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken) throws DataAccessException{
         return null;
     }
 
     @Override
-    public void clear() {
+    public void clear() throws DataAccessException {
 
     }
 }

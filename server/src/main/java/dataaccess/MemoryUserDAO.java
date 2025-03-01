@@ -1,7 +1,6 @@
 package dataaccess;
 
 import model.UserData;
-import service.UserServiceException;
 
 import java.util.HashMap;
 import java.util.Map;
