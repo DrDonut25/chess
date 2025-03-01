@@ -79,7 +79,13 @@ public class Server {
         LoginRequest loginRequest = serializer.fromJson(request.body(), LoginRequest.class);
         LoginResult loginResult = userService.login(loginRequest);
         if (loginResult.message() != null) {
-
+            switch (loginResult.message()) {
+                case "Error: unauthorized" -> response.status(401);
+                case "Error: Data Access Exception" -> response.status(500);
+            }
+        } else {
+            response.status(200);
         }
+        return serializer.toJson(loginResult);
     }
 }

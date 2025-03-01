@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import model.UserData;
 import requestsresults.*;
 
 public class UserService {
@@ -27,15 +28,21 @@ public class UserService {
                 return new RegisterResult(null, null, "Error: already taken");
             }
             userDAO.createUser(username, registerRequest.password(), registerRequest.email());
-            String authToken = authDAO.createAuth(username);
-            return new RegisterResult(username, authToken, null);
+            return new RegisterResult(username, authDAO.createAuth(username), null);
         } catch (DataAccessException e) {
             return new RegisterResult(null, null, "Error: Data Access Exception");
         }
     }
     public LoginResult login(LoginRequest loginRequest) {
-        LoginResult loginResult = null;
-        return loginResult;
+        try {
+            String username = loginRequest.username();
+            if (userDAO.getUser(username) == null || !userDAO.getUser(username).password().equals(loginRequest.password())) {
+                return new LoginResult(null, null, "Error: unauthorized");
+            }
+            return new LoginResult(username, authDAO.createAuth(username), null);
+        } catch (DataAccessException e) {
+            return new LoginResult(null, null, "Error: Data Access Exception");
+        }
     }
     public void logout(String authToken) {
 
