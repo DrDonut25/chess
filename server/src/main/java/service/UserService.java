@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.Database;
 import dataaccess.MemoryUserDAO;
 import model.UserData;
 import requestsresults.LoginRequest;
@@ -8,21 +9,27 @@ import requestsresults.RegisterRequest;
 import requestsresults.RegisterResult;
 
 public class UserService {
-    public static RegisterResult register(RegisterRequest registerRequest) {
+    private Database db; //do I have to keep on passing this down until I reach a DAO class, then somehow kick it back up the chain?
+
+    public UserService(Database db) {
+        this.db = db;
+    }
+
+    public RegisterResult register(RegisterRequest registerRequest) {
         String username = registerRequest.username();
         UserData userData = MemoryUserDAO.getUser(username);
         RegisterResult registerResult = null;
         return registerResult;
     }
-    public static LoginResult login(LoginRequest loginRequest) {
+    public LoginResult login(LoginRequest loginRequest) {
         LoginResult loginResult = null;
         return loginResult;
     }
-    public static void logout(String authToken) {
+    public void logout(String authToken) {
 
     }
 
-    public static void clearUsers() {
+    public void clearUsers() {
         //clear authData as well, as it is linked to UserData?
 
     }
