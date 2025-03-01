@@ -4,30 +4,35 @@ import model.AuthData;
 import model.GameData;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 public class MemoryGameDAO implements GameDAO {
     private Map<Integer, GameData> games;
 
-    public static void createGame(AuthData authData) {
+    public void createGame(AuthData auth) {
+        games = new HashMap<Integer, GameData>();
+    }
+
+    public GameData getGame(int gameID) {
+        return games.get(gameID);
+    }
+
+    public GameData[] listGames(AuthData auth) {
+        GameData[] gameList = new GameData[games.size()];
+        int i = 0;
+        for (GameData game: games.values()) {
+            gameList[i] = game;
+            i++;
+        }
+        return gameList;
+    }
+
+    public void updateGame(int gameID, String playerColor) {
 
     }
 
-    public static GameData getGame(String gameID) {
-        GameData gameData = null;
-        return gameData;
-    }
-
-    public static ArrayList<GameData> listGames(AuthData authData) {
-        ArrayList<GameData> games = new ArrayList<>();
-        return games;
-    }
-
-    public static void updateGame(String gameID, String playerColor) {
-
-    }
-
-    public static void clear() {
-
+    public void clear() {
+        games = new HashMap<Integer, GameData>();
     }
 }

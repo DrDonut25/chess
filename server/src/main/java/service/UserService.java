@@ -22,10 +22,10 @@ public class UserService {
         if (registerRequest.username() == null || registerRequest.password() == null || registerRequest.email() == null) {
             return new RegisterResult(null, null, "Error: bad request");
         }
-        if (MemoryUserDAO.getUser(username) != null) {
+        if (userDAO.getUser(username) != null) {
             return new RegisterResult(null, null, "Error: already taken");
         }
-        MemoryUserDAO.createUser(username, registerRequest.password(), registerRequest.email());
+        userDAO.createUser(username, registerRequest.password(), registerRequest.email());
         try {
             String authToken = authDAO.createAuth(username);
             return new RegisterResult(username, authToken, null);
