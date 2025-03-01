@@ -2,9 +2,19 @@ package dataaccess;
 
 import model.AuthData;
 
-public class MemoryAuthDAO implements AuthDAO {
-    public static void createAuth() {
+import java.util.UUID;
 
+public class MemoryAuthDAO implements AuthDAO {
+    private static Database db;
+
+    public static String createAuth(String username) {
+        String authToken = generateToken();
+        db.addAuth(new AuthData(username, authToken));
+        return authToken;
+    }
+
+    public static String generateToken() {
+        return UUID.randomUUID().toString();
     }
 
     public static AuthData getAuth(String authToken) {

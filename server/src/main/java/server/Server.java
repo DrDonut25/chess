@@ -6,6 +6,7 @@ import requestsresults.RegisterRequest;
 import requestsresults.RegisterResult;
 import service.GameService;
 import service.UserService;
+import service.UserServiceException;
 import spark.*;
 
 public class Server {
@@ -37,8 +38,9 @@ public class Server {
         Spark.awaitStop();
     }
 
-    private String register(Request request, Response response) {
+    private String register(Request request, Response response) throws UserServiceException {
         var serializer = new Gson();
+        //Where to place 400/500 exceptions? What exactly causes these errors? How do I avoid sending the wrong exception?
         RegisterRequest registerRequest = serializer.fromJson(request.body(), RegisterRequest.class);
         RegisterResult registerResult = userService.register(registerRequest);
         response.status(200);

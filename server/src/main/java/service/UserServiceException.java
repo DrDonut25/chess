@@ -1,7 +1,14 @@
 package service;
 
 public class UserServiceException extends RuntimeException {
-    public UserServiceException(String message) {
+    private final int statusCode;
+
+    public UserServiceException(int statusCode, String message) {
         super(message);
+        this.statusCode = statusCode;
+    }
+
+    public int getStatusCode() {
+        return statusCode;
     }
 }
