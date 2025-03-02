@@ -129,7 +129,8 @@ public class ChessGame {
                     //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
                     Collection<ChessMove> moves = enemyPiece.pieceMoves(board, position);
                     for (ChessMove move: moves) {
-                        if (board.getPiece(move.getEndPosition()) != null && board.getPiece(move.getEndPosition()).getPieceType() == ChessPiece.PieceType.KING && board.getPiece(move.getEndPosition()).getTeamColor() == teamColor) {
+                        ChessPiece piece = board.getPiece(move.getEndPosition());
+                        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
                             return true;
                         }
                     }
