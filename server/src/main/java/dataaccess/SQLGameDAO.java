@@ -15,7 +15,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData[] listGames(AuthData auth) throws DataAccessException {
+    public GameData[] listGames() throws DataAccessException {
         return new GameData[0];
     }
 

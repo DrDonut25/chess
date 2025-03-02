@@ -19,7 +19,7 @@ public class Server {
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
         this.userService = new UserService(authDAO, userDAO);
-        this.gameService = new GameService(gameDAO);
+        this.gameService = new GameService(authDAO, gameDAO);
     }
 
     public int run(int desiredPort) {
@@ -34,6 +34,7 @@ public class Server {
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
+        Spark.get("/game", this::listGames);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
         //Spark.init();
 
@@ -103,5 +104,20 @@ public class Server {
             response.status(200);;
         }
         return serializer.toJson(logoutResult);
+    }
+
+    private String listGames(Request request, Response response) {
+        var serializer = new Gson();
+        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
+        ListGameResult listGameResult = gameService.listGames(authToken);
+        if (listGameResult.message() != null) {
+            switch (listGameResult.message()) {
+                case "Error: unauthorized" -> response.status(401);
+                case "Error: Data Access Exception" -> response.status(500);
+            }
+        } else {
+            response.status(200);
+        }
+        return serializer.toJson(listGameResult);
     }
 }

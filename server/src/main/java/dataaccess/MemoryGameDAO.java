@@ -17,7 +17,7 @@ public class MemoryGameDAO implements GameDAO {
         return games.get(gameID);
     }
 
-    public GameData[] listGames(AuthData auth) {
+    public GameData[] listGames() {
         GameData[] gameList = new GameData[games.size()];
         int i = 0;
         for (GameData game: games.values()) {
