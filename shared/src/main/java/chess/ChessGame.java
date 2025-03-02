@@ -125,17 +125,25 @@ public class ChessGame {
             for (int j = 1; j < 9; j++) {
                 ChessPosition position = new ChessPosition(i,j);
                 ChessPiece enemyPiece = board.getPiece(position);
-                if (enemyPiece != null && enemyPiece.getTeamColor() != teamColor) {
-                    //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
-                    Collection<ChessMove> moves = enemyPiece.pieceMoves(board, position);
-                    for (ChessMove move: moves) {
-                        ChessPiece piece = board.getPiece(move.getEndPosition());
-                        return (piece != null) && (piece.getPieceType() == ChessPiece.PieceType.KING) && (piece.getTeamColor() == teamColor);
-                    }
+                if (enemyThreatensKing(position, enemyPiece, teamColor)) {
+                    return true;
                 }
             }
         }
         return false;
+    }
+
+    private boolean enemyThreatensKing(ChessPosition position,  ChessPiece enemyPiece, TeamColor teamColor) {
+        if (enemyPiece != null && enemyPiece.getTeamColor() != teamColor) {
+            //for each enemy piece, check if the king is in their Collection of ChessMoves. If one is found, return true
+            Collection<ChessMove> moves = enemyPiece.pieceMoves(board, position);
+            for (ChessMove move: moves) {
+                ChessPiece piece = board.getPiece(move.getEndPosition());
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return true;
+                }
+            }
+        }
     }
 
     /**
