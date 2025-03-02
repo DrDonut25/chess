@@ -15,7 +15,7 @@ public class MemoryAuthDAO implements AuthDAO {
 
     public String createAuth(String username) {
         String authToken = generateToken();
-        auths.put(username, new AuthData(username, authToken));
+        auths.put(authToken, new AuthData(username, authToken));
         return authToken;
     }
 
@@ -24,8 +24,11 @@ public class MemoryAuthDAO implements AuthDAO {
     }
 
     public AuthData getAuth(String authToken) {
-        AuthData authData = null;
-        return authData;
+        return auths.get(authToken);
+    }
+
+    public void deleteAuth(String authToken) {
+        auths.remove(authToken);
     }
 
     public void clear() {

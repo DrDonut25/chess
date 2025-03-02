@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import model.AuthData;
 import model.UserData;
 import requestsresults.*;
 
@@ -44,7 +45,16 @@ public class UserService {
             return new LoginResult(null, null, "Error: Data Access Exception");
         }
     }
-    public void logout(String authToken) {
 
+    public LogoutResult logout(String authToken) {
+        try {
+            if (authDAO.getAuth(authToken) == null) {
+                return new LogoutResult("Error: unauthorized");
+            }
+            authDAO.deleteAuth(authToken);
+            return new LogoutResult("");
+        } catch (DataAccessException e) {
+            return new LogoutResult("Error: Data Access Exception");
+        }
     }
 }

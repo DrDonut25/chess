@@ -2,13 +2,13 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import requestsresults.LoginRequest;
-import requestsresults.LoginResult;
-import requestsresults.RegisterRequest;
-import requestsresults.RegisterResult;
+import passoff.exception.ResponseParseException;
+import requestsresults.*;
 import service.GameService;
 import service.UserService;
 import spark.*;
+
+import java.io.Reader;
 
 public class Server {
     private UserService userService;
@@ -33,6 +33,7 @@ public class Server {
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/session", this::logout);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
         //Spark.init();
 
@@ -87,5 +88,20 @@ public class Server {
             response.status(200);
         }
         return serializer.toJson(loginResult);
+    }
+
+    private String logout(Request request, Response response) {
+        var serializer = new Gson();
+        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
+        LogoutResult logoutResult = userService.logout(authToken);
+        if (logoutResult.message() != null) {
+            switch (logoutResult.message()){
+                case "Error: unauthorized" -> response.status(401);
+                case "Error: Data Access Exception" -> response.status(500);
+            }
+        } else {
+            response.status(200);;
+        }
+        return serializer.toJson(logoutResult);
     }
 }

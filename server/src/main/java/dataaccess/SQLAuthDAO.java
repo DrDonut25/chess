@@ -19,6 +19,11 @@ public class SQLAuthDAO implements AuthDAO {
     }
 
     @Override
+    public void deleteAuth(String authToken) throws DataAccessException {
+
+    }
+
+    @Override
     public void clear() throws DataAccessException {
 
     }
