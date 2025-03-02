@@ -40,8 +40,25 @@ public class GameService {
         }
     }
 
-    public void joinGame(JoinGameRequest joinGameRequest) {
-
+    public JoinGameResult joinGame(JoinGameRequest joinGameRequest) {
+        try {
+            String playerColor = joinGameRequest.playerColor();
+            Integer gameID = joinGameRequest.gameID();
+            if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameID == null) {
+                return new JoinGameResult("Error: bad request");
+            }
+            if (authDAO.getAuth(joinGameRequest.authToken()) == null) {
+                return new JoinGameResult("Error: unauthorized");
+            }
+            if (gameDAO.colorIsTaken(playerColor, gameID)) {
+                return new JoinGameResult("Error: already taken");
+            }
+            String username = authDAO.getAuth(joinGameRequest.authToken()).username();
+            gameDAO.updateGame(gameID, playerColor, username);
+            return new JoinGameResult("");
+        } catch (DataAccessException e) {
+            return new JoinGameResult("Error: Data Access Exception");
+        }
     }
 
     public void clear() throws DataAccessException {

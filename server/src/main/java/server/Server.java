@@ -123,7 +123,7 @@ public class Server {
     private String createGame(Request request, Response response) {
         var serializer = new Gson();
         String authToken = serializer.fromJson(request.headers("authorization"), String.class);
-        IntermediateGameRequest interReq = serializer.fromJson(request.body(), IntermediateGameRequest.class);
+        IntermediateCreateRequest interReq = serializer.fromJson(request.body(), IntermediateCreateRequest.class);
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, interReq.gameName());
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
         if (createGameResult.message() != null) {
@@ -140,7 +140,21 @@ public class Server {
 
     private String joinGame(Request request, Response response) {
         var serializer = new Gson();
+        String header= request.headers("authorization");
         String authToken = serializer.fromJson(request.headers("authorization"), String.class);
-        return "";
+        IntermediateJoinRequest interReq = serializer.fromJson(request.body(), IntermediateJoinRequest.class);
+        JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, interReq.playerColor(), interReq.gameID());
+        JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);
+        if (joinGameResult.message() != null) {
+            switch (joinGameResult.message()) {
+                case "Error: bad request" -> response.status(400);
+                case "Error: unauthorized" -> response.status(401);
+                case "Error: already taken" -> response.status(403);
+                case "Error: Data Access Exception" -> response.status(500);
+            }
+        } else {
+            response.status(200);
+        }
+        return serializer.toJson(joinGameResult);
     }
 }

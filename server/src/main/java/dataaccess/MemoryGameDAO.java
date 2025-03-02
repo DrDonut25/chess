@@ -1,7 +1,6 @@
 package dataaccess;
 
 import chess.ChessGame;
-import model.AuthData;
 import model.GameData;
 
 import java.util.HashMap;
@@ -24,8 +23,16 @@ public class MemoryGameDAO implements GameDAO {
         return games.size() + 1;
     }
 
-    public GameData getGame(int gameID) {
+    public GameData getGame(Integer gameID) {
         return games.get(gameID);
+    }
+
+    public boolean colorIsTaken(String playerColor, Integer gameID) {
+        if (playerColor.equals("WHITE")) {
+            return getGame(gameID).whiteUsername() != null;
+        } else {
+            return getGame(gameID).blackUsername() != null;
+        }
     }
 
     public GameData[] listGames() {
@@ -38,8 +45,20 @@ public class MemoryGameDAO implements GameDAO {
         return gameList;
     }
 
-    public void updateGame(int gameID, String playerColor) {
-
+    public void updateGame(Integer gameID, String playerColor, String username) {
+        if (playerColor.equals("WHITE")) {
+            GameData oldGame = games.get(gameID);
+            String blackUsername = oldGame.blackUsername();
+            String gameName = oldGame.gameName();
+            ChessGame game = oldGame.game();
+            games.put(gameID, new GameData(gameID, username, blackUsername, gameName, game));
+        } else {
+            GameData oldGame = games.get(gameID);
+            String whiteUsername = oldGame.whiteUsername();
+            String gameName = oldGame.gameName();
+            ChessGame game = oldGame.game();
+            games.put(gameID, new GameData(gameID, whiteUsername, username, gameName, game));
+        }
     }
 
     public void clear() {

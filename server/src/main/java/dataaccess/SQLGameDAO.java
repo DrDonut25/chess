@@ -9,8 +9,13 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public GameData getGame(int gameID) throws DataAccessException {
+    public GameData getGame(Integer gameID) throws DataAccessException {
         return null;
+    }
+
+    @Override
+    public boolean colorIsTaken(String playerColor, Integer gameID) {
+        return false;
     }
 
     @Override
@@ -19,7 +24,7 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public void updateGame(int gameID, String playerColor) throws DataAccessException {
+    public void updateGame(Integer gameID, String playerColor, String username) throws DataAccessException {
 
     }
 
