@@ -149,20 +149,7 @@ public class ChessGame {
         if (!this.isInCheck(teamColor)) {
             return false;
         } else {
-            //iterate through every friendly piece. If all friendly pieces have zero valid moves, return true
-            for (int i = 1; i < 9; i++) {
-                for (int j = 1; j < 9; j++) {
-                    ChessPosition position = new ChessPosition(i,j);
-                    ChessPiece friendlyPiece = board.getPiece(position);
-                    if (friendlyPiece != null && friendlyPiece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> valMoves = this.validMoves(position);
-                        if (!valMoves.isEmpty()) {
-                            return false;
-                        }
-                    }
-                }
-            }
-            return true;
+            return noValidMoves(teamColor);
         }
     }
 
@@ -178,21 +165,25 @@ public class ChessGame {
         if (this.isInCheck(teamColor)) {
             return false;
         } else {
-            //iterate through every friendly piece. If all friendly pieces have zero valid moves, return true
-            for (int i = 1; i < 9; i++) {
-                for (int j = 1; j < 9; j++) {
-                    ChessPosition position = new ChessPosition(i,j);
-                    ChessPiece friendlyPiece = board.getPiece(position);
-                    if (friendlyPiece != null && friendlyPiece.getTeamColor() == teamColor) {
-                        Collection<ChessMove> valMoves = this.validMoves(position);
-                        if (!valMoves.isEmpty()) {
-                            return false;
-                        }
+            return noValidMoves(teamColor);
+        }
+    }
+
+    public boolean noValidMoves(TeamColor teamColor) {
+        //iterate through every friendly piece. If all friendly pieces have zero valid moves, return true
+        for (int i = 1; i < 9; i++) {
+            for (int j = 1; j < 9; j++) {
+                ChessPosition position = new ChessPosition(i,j);
+                ChessPiece friendlyPiece = board.getPiece(position);
+                if (friendlyPiece != null && friendlyPiece.getTeamColor() == teamColor) {
+                    Collection<ChessMove> valMoves = this.validMoves(position);
+                    if (!valMoves.isEmpty()) {
+                        return false;
                     }
                 }
             }
-            return true;
         }
+        return true;
     }
 
     /**
