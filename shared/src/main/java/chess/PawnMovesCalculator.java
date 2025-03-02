@@ -26,48 +26,17 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                     }
                 }
             } else if (board.getPiece(endPos) == null && endPos.getRow() == 8) {
-                ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                moves.add(knightPromo);
-                moves.add(bishopPromo);
-                moves.add(rookPromo);
-                moves.add(queenPromo);
+                addPromoMoves(position, endPos, moves);
             }
             //check for diagonal enemy pieces
             endPos = new ChessPosition(position.getRow() + 1, position.getColumn() + 1);
-            if (endPos.isValidPosition() && board.getPiece(endPos) != null && board.getPiece(endPos).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                if (endPos.getRow() == 8) {
-                    ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                    ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                    ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                    ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                    moves.add(knightPromo);
-                    moves.add(bishopPromo);
-                    moves.add(rookPromo);
-                    moves.add(queenPromo);
-                } else {
-                    ChessMove attackMove = new ChessMove(position, endPos);
-                    moves.add(attackMove);
-                }
+            if (hasDiagonalEnemy(endPos, board, ChessGame.TeamColor.WHITE)) {
+                addDiagonalMoves(position, endPos, moves, ChessGame.TeamColor.WHITE);
             }
             //check other diagonal
             endPos = new ChessPosition(position.getRow() + 1, position.getColumn() - 1);
-            if (endPos.isValidPosition() && board.getPiece(endPos) != null && board.getPiece(endPos).getTeamColor() == ChessGame.TeamColor.BLACK) {
-                if (endPos.getRow() == 8) {
-                    ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                    ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                    ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                    ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                    moves.add(knightPromo);
-                    moves.add(bishopPromo);
-                    moves.add(rookPromo);
-                    moves.add(queenPromo);
-                } else {
-                    ChessMove attackMove = new ChessMove(position, endPos);
-                    moves.add(attackMove);
-                }
+            if (hasDiagonalEnemy(endPos, board, ChessGame.TeamColor.WHITE)) {
+                addDiagonalMoves(position, endPos, moves, ChessGame.TeamColor.WHITE);
             }
         } else {
             //black pawn implementation
@@ -87,50 +56,49 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                     }
                 }
             } else if (board.getPiece(endPos) == null && endPos.getRow() == 1) {
-                ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                moves.add(knightPromo);
-                moves.add(bishopPromo);
-                moves.add(rookPromo);
-                moves.add(queenPromo);
+                addPromoMoves(position, endPos, moves);
             }
             //check for diagonal enemy pieces
             endPos = new ChessPosition(position.getRow() - 1, position.getColumn() + 1);
-            if (endPos.isValidPosition() && board.getPiece(endPos) != null && board.getPiece(endPos).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                if (endPos.getRow() == 1) {
-                    ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                    ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                    ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                    ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                    moves.add(knightPromo);
-                    moves.add(bishopPromo);
-                    moves.add(rookPromo);
-                    moves.add(queenPromo);
-                } else {
-                    ChessMove attackMove = new ChessMove(position, endPos);
-                    moves.add(attackMove);
-                }
+            if (hasDiagonalEnemy(endPos, board, ChessGame.TeamColor.BLACK)) {
+                addDiagonalMoves(position, endPos, moves, ChessGame.TeamColor.BLACK);
             }
             //check other diagonal
             endPos = new ChessPosition(position.getRow() - 1, position.getColumn() - 1);
-            if (endPos.isValidPosition() && board.getPiece(endPos) != null && board.getPiece(endPos).getTeamColor() == ChessGame.TeamColor.WHITE) {
-                if (endPos.getRow() == 1) {
-                    ChessMove knightPromo = new ChessMove(position,endPos, ChessPiece.PieceType.KNIGHT);
-                    ChessMove bishopPromo = new ChessMove(position,endPos, ChessPiece.PieceType.BISHOP);
-                    ChessMove rookPromo = new ChessMove(position,endPos, ChessPiece.PieceType.ROOK);
-                    ChessMove queenPromo = new ChessMove(position,endPos, ChessPiece.PieceType.QUEEN);
-                    moves.add(knightPromo);
-                    moves.add(bishopPromo);
-                    moves.add(rookPromo);
-                    moves.add(queenPromo);
-                } else {
-                    ChessMove attackMove = new ChessMove(position, endPos);
-                    moves.add(attackMove);
-                }
+            if (hasDiagonalEnemy(endPos, board, ChessGame.TeamColor.BLACK)) {
+                addDiagonalMoves(position, endPos, moves, ChessGame.TeamColor.BLACK);
             }
         }
         return moves;
+    }
+
+    private boolean hasDiagonalEnemy(ChessPosition endPos, ChessBoard board, ChessGame.TeamColor teamColor) {
+        return endPos.isValidPosition() && board.getPiece(endPos) != null && board.getPiece(endPos).getTeamColor() != teamColor;
+    }
+
+    private void addDiagonalMoves(ChessPosition position, ChessPosition endPos, ArrayList<ChessMove> moves, ChessGame.TeamColor teamColor) {
+        int promoRow;
+        if (teamColor == ChessGame.TeamColor.WHITE) {
+            promoRow = 8;
+        } else {
+            promoRow = 1;
+        }
+        if (endPos.getRow() == promoRow) {
+            addPromoMoves(position, endPos, moves);
+        } else {
+            ChessMove attackMove = new ChessMove(position, endPos);
+            moves.add(attackMove);
+        }
+    }
+
+    private void addPromoMoves(ChessPosition position,  ChessPosition endPos, ArrayList<ChessMove> moves) {
+        ChessMove knightPromo = new ChessMove(position, endPos, ChessPiece.PieceType.KNIGHT);
+        ChessMove bishopPromo = new ChessMove(position, endPos, ChessPiece.PieceType.BISHOP);
+        ChessMove rookPromo = new ChessMove(position, endPos, ChessPiece.PieceType.ROOK);
+        ChessMove queenPromo = new ChessMove(position, endPos, ChessPiece.PieceType.QUEEN);
+        moves.add(knightPromo);
+        moves.add(bishopPromo);
+        moves.add(rookPromo);
+        moves.add(queenPromo);
     }
 }
