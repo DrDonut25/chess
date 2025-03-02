@@ -130,9 +130,7 @@ public class ChessGame {
                     Collection<ChessMove> moves = enemyPiece.pieceMoves(board, position);
                     for (ChessMove move: moves) {
                         ChessPiece piece = board.getPiece(move.getEndPosition());
-                        if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
-                            return true;
-                        }
+                        return (piece != null) && (piece.getPieceType() == ChessPiece.PieceType.KING) && (piece.getTeamColor() == teamColor);
                     }
                 }
             }
