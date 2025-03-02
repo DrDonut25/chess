@@ -122,7 +122,7 @@ public class Server {
 
     private String createGame(Request request, Response response) {
         var serializer = new Gson();
-        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
+        String authToken = request.headers("authorization");
         IntermediateCreateRequest interReq = serializer.fromJson(request.body(), IntermediateCreateRequest.class);
         CreateGameRequest createGameRequest = new CreateGameRequest(authToken, interReq.gameName());
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
@@ -140,8 +140,7 @@ public class Server {
 
     private String joinGame(Request request, Response response) {
         var serializer = new Gson();
-        String header= request.headers("authorization");
-        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
+        String authToken = request.headers("authorization");
         IntermediateJoinRequest interReq = serializer.fromJson(request.body(), IntermediateJoinRequest.class);
         JoinGameRequest joinGameRequest = new JoinGameRequest(authToken, interReq.playerColor(), interReq.gameID());
         JoinGameResult joinGameResult = gameService.joinGame(joinGameRequest);

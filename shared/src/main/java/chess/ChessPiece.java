@@ -52,7 +52,7 @@ public class ChessPiece {
      * @return Collection of valid moves
      */
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition myPosition) {
-        pieceMovesCalculator movesCalculator;
+        PieceMovesCalculator movesCalculator;
         if (this.getPieceType() == PieceType.KING) {
             movesCalculator = new KingMovesCalculator();
             return movesCalculator.pieceMoves(board, myPosition);
