@@ -123,8 +123,8 @@ public class Server {
     private String createGame(Request request, Response response) {
         var serializer = new Gson();
         String authToken = serializer.fromJson(request.headers("authorization"), String.class);
-        String gameName = serializer.fromJson(request.body(), String.class);
-        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
+        IntermediateGameRequest interReq = serializer.fromJson(request.body(), IntermediateGameRequest.class);
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, interReq.gameName());
         CreateGameResult createGameResult = gameService.createGame(createGameRequest);
         if (createGameResult.message() != null) {
             switch (createGameResult.message()) {
@@ -139,6 +139,8 @@ public class Server {
     }
 
     private String joinGame(Request request, Response response) {
+        var serializer = new Gson();
+        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
         return "";
     }
 }
