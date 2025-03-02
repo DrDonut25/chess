@@ -1,5 +1,6 @@
 package dataaccess;
 
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 
@@ -9,8 +10,18 @@ import java.util.Map;
 public class MemoryGameDAO implements GameDAO {
     private Map<Integer, GameData> games;
 
-    public void createGame(AuthData auth) {
+    public MemoryGameDAO() {
         games = new HashMap<Integer, GameData>();
+    }
+
+    public Integer createGame(String gameName) {
+        int gameID = generateGameID();
+        games.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
+        return gameID;
+    }
+
+    public int generateGameID() {
+        return games.size() + 1;
     }
 
     public GameData getGame(int gameID) {

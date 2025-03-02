@@ -2,17 +2,14 @@ package server;
 
 import com.google.gson.Gson;
 import dataaccess.*;
-import passoff.exception.ResponseParseException;
 import requestsresults.*;
 import service.GameService;
 import service.UserService;
 import spark.*;
 
-import java.io.Reader;
-
 public class Server {
-    private UserService userService;
-    private GameService gameService;
+    private final UserService userService;
+    private final GameService gameService;
 
     public Server() {
         MemoryUserDAO userDAO = new MemoryUserDAO();
@@ -35,6 +32,8 @@ public class Server {
         Spark.post("/session", this::login);
         Spark.delete("/session", this::logout);
         Spark.get("/game", this::listGames);
+        Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
         //Spark.init();
 
@@ -101,7 +100,7 @@ public class Server {
                 case "Error: Data Access Exception" -> response.status(500);
             }
         } else {
-            response.status(200);;
+            response.status(200);
         }
         return serializer.toJson(logoutResult);
     }
@@ -119,5 +118,27 @@ public class Server {
             response.status(200);
         }
         return serializer.toJson(listGameResult);
+    }
+
+    private String createGame(Request request, Response response) {
+        var serializer = new Gson();
+        String authToken = serializer.fromJson(request.headers("authorization"), String.class);
+        String gameName = serializer.fromJson(request.body(), String.class);
+        CreateGameRequest createGameRequest = new CreateGameRequest(authToken, gameName);
+        CreateGameResult createGameResult = gameService.createGame(createGameRequest);
+        if (createGameResult.message() != null) {
+            switch (createGameResult.message()) {
+                case "Error: bad request" -> response.status(400);
+                case "Error: unauthorized" -> response.status(401);
+                case "Error: Data Access Exception" -> response.status(500);
+            }
+        } else {
+            response.status(200);
+        }
+        return serializer.toJson(createGameResult);
+    }
+
+    private String joinGame(Request request, Response response) {
+        return "";
     }
 }

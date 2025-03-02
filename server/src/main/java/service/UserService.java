@@ -1,13 +1,11 @@
 package service;
 
 import dataaccess.*;
-import model.AuthData;
-import model.UserData;
 import requestsresults.*;
 
 public class UserService {
-    private AuthDAO authDAO;
-    private UserDAO userDAO;
+    private final AuthDAO authDAO;
+    private final UserDAO userDAO;
 
     public UserService(AuthDAO authDAO, UserDAO userDAO) {
         this.authDAO = authDAO;

@@ -6,8 +6,8 @@ import dataaccess.GameDAO;
 import requestsresults.*;
 
 public class GameService {
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
 
     public GameService(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
@@ -26,8 +26,18 @@ public class GameService {
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) {
-        CreateGameResult createGameResult = null;
-        return createGameResult;
+        try {
+            if (createGameRequest.authToken() == null || createGameRequest.gameName() == null) {
+                return new CreateGameResult(null, "Error: bad request");
+            }
+            if (authDAO.getAuth(createGameRequest.authToken()) == null) {
+                return new CreateGameResult(null, "Error: unauthorized");
+            }
+            Integer gameID = gameDAO.createGame(createGameRequest.gameName());
+            return new CreateGameResult(gameID, null);
+        } catch (DataAccessException e) {
+            return new CreateGameResult(null, "Error: Data Access Exception");
+        }
     }
 
     public void joinGame(JoinGameRequest joinGameRequest) {

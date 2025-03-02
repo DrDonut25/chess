@@ -1,10 +1,9 @@
 package dataaccess;
 
-import model.AuthData;
 import model.GameData;
 
 public interface GameDAO {
-    void createGame(AuthData auth) throws DataAccessException;
+    Integer createGame(String gameName) throws DataAccessException;
     GameData getGame(int gameID) throws DataAccessException;
     GameData[] listGames() throws DataAccessException;
     void updateGame(int gameID, String playerColor) throws DataAccessException;

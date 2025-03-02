@@ -1,12 +1,11 @@
 package dataaccess;
 
-import model.AuthData;
 import model.GameData;
 
 public class SQLGameDAO implements GameDAO {
     @Override
-    public void createGame(AuthData auth) throws DataAccessException{
-
+    public Integer createGame(String gameName) throws DataAccessException{
+        return 0;
     }
 
     @Override
