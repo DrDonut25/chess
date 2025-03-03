@@ -13,10 +13,6 @@ public class MemoryGameDAO implements GameDAO {
         games = new HashMap<Integer, GameData>();
     }
 
-    public Map<Integer, GameData> getGames() {
-        return games;
-    }
-
     public Integer createGame(String gameName) {
         int gameID = generateGameID();
         games.put(gameID, new GameData(gameID, null, null, gameName, new ChessGame()));
