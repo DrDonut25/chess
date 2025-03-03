@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.Map;
+
 public class SQLAuthDAO implements AuthDAO {
     @Override
     public String createAuth(String username) throws DataAccessException {

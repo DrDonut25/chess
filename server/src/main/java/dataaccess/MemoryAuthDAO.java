@@ -13,6 +13,10 @@ public class MemoryAuthDAO implements AuthDAO {
         auths = new HashMap<String, AuthData>();
     }
 
+    public Map<String, AuthData> getAuths() {
+        return auths;
+    }
+
     public String createAuth(String username) {
         String authToken = generateToken();
         auths.put(authToken, new AuthData(authToken, username));

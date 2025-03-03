@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.AuthData;
 
+import java.util.Map;
+
 public interface AuthDAO {
     String createAuth(String username) throws DataAccessException;
     String generateToken();

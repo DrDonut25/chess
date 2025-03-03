@@ -12,6 +12,10 @@ public class MemoryUserDAO implements UserDAO {
         users = new HashMap<String, UserData>();
     }
 
+    public Map<String, UserData> getUsers() {
+        return users;
+    }
+
     public void createUser(String username, String password, String email) {
         users.put(username, new UserData(username, password, email));
     }

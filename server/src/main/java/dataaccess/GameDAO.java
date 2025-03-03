@@ -2,6 +2,8 @@ package dataaccess;
 
 import model.GameData;
 
+import java.util.Map;
+
 public interface GameDAO {
     Integer createGame(String gameName) throws DataAccessException;
     GameData getGame(Integer gameID) throws DataAccessException;
