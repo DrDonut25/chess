@@ -8,13 +8,21 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    private final UserService userService;
-    private final GameService gameService;
+    private UserService userService;
+    private GameService gameService;
 
-    public Server() {
+    public void setMemoryDAO() {
         MemoryUserDAO userDAO = new MemoryUserDAO();
         MemoryAuthDAO authDAO = new MemoryAuthDAO();
         MemoryGameDAO gameDAO = new MemoryGameDAO();
+        this.userService = new UserService(authDAO, userDAO);
+        this.gameService = new GameService(authDAO, gameDAO);
+    }
+
+    public void setSQLDAO() {
+        SQLUserDAO userDAO = new SQLUserDAO();
+        SQLAuthDAO authDAO = new SQLAuthDAO();
+        SQLGameDAO gameDAO = new SQLGameDAO();
         this.userService = new UserService(authDAO, userDAO);
         this.gameService = new GameService(authDAO, gameDAO);
     }
