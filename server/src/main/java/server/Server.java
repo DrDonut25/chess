@@ -19,7 +19,7 @@ public class Server {
         this.gameService = new GameService(authDAO, gameDAO);
     }
 
-    public void setSQLDAO() {
+    public void setSQLDAO() throws DataAccessException {
         SQLUserDAO userDAO = new SQLUserDAO();
         SQLAuthDAO authDAO = new SQLAuthDAO();
         SQLGameDAO gameDAO = new SQLGameDAO();
