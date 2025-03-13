@@ -38,13 +38,23 @@ public class UserDAOTests {
     @Test
     @Order(3)
     public void successGetUser() {
-
+        try {
+            userDAO.createUser("myUsername", "Password123", "myEmail");
+            Assertions.assertDoesNotThrow(() -> userDAO.getUser("myUsername"));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(4)
     public void getUserFailed() {
-
+        try {
+            userDAO.createUser("myUsername", "Password123", "myEmail");
+            Assertions.assertNull(userDAO.getUser("badUsername"));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
