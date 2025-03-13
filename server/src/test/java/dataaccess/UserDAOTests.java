@@ -40,7 +40,7 @@ public class UserDAOTests {
     public void successGetUser() {
         try {
             userDAO.createUser("myUsername", "Password123", "myEmail");
-            Assertions.assertDoesNotThrow(() -> userDAO.getUser("myUsername"));
+            Assertions.assertNotNull(userDAO.getUser("myUsername"));
         } catch (DataAccessException e) {
             throw new AssertionError(e.getMessage());
         }

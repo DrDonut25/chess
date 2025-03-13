@@ -3,7 +3,6 @@ package dataaccess;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
-import javax.management.Query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
@@ -25,10 +24,9 @@ public class SQLUserDAO implements UserDAO {
                 ps.setString(1, username);
                 try (ResultSet rs = ps.executeQuery()) {
                     if (rs.next()) {
-                        String name = rs.getString("username");
                         String hashedPassword = rs.getString("password");
                         String email = rs.getString("email");
-                        return new UserData(name, hashedPassword, email);
+                        return new UserData(username, hashedPassword, email);
                     }
                 }
             }
