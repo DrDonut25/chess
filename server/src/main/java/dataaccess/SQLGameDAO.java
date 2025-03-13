@@ -45,11 +45,12 @@ public class SQLGameDAO implements GameDAO {
             //NOTE: createGameTable still needs implementation for ChessGame
             String createGameTable = """
                     CREATE TABLE IF NOT EXISTS game (
-                    id INTEGER NOT NULL;
-                    white_username VARCHAR(255) NOT NULL;
-                    black_username VARCHAR(255) NOT NULL;
-                    name VARCHAR(255) NOT NULL;
-                    game ;
+                    id INTEGER NOT NULL,
+                    white_username VARCHAR(255) NOT NULL,
+                    black_username VARCHAR(255) NOT NULL,
+                    name VARCHAR(255) NOT NULL,
+                    game TEXT NOT NULL,
+                    PRIMARY KEY ('id')
                     )""";
             try (var createTableStatement = conn.prepareStatement(createGameTable)) {
                 createTableStatement.executeUpdate();
