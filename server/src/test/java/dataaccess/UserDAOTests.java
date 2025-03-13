@@ -1,19 +1,38 @@
 package dataaccess;
 
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 public class UserDAOTests {
+    static UserDAO userDAO;
+
+    @BeforeAll
+    public static void createUserDAO() {
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
+    }
+
+    @AfterAll
+    public static void clearUsers() {
+        try {
+            userDAO.clear();
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
+    }
+
     @Test
     @Order(1)
     public void successCreateUser() {
-
+        Assertions.assertDoesNotThrow(() -> userDAO.createUser("myUsername", "Password123", "myEmail"));
     }
 
     @Test
     @Order(2)
     public void createUserFailed() {
-
+        Assertions.assertThrows(DataAccessException.class, () -> userDAO.createUser("myUsername", "Password123", null));
     }
 
     @Test
@@ -31,6 +50,6 @@ public class UserDAOTests {
     @Test
     @Order(5)
     public void successClear() {
-
+        Assertions.assertDoesNotThrow(userDAO::clear);
     }
 }
