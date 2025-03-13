@@ -44,7 +44,10 @@ public class GameService {
         try {
             String playerColor = joinGameRequest.playerColor();
             Integer gameID = joinGameRequest.gameID();
-            if (playerColor == null || (!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameDAO.getGame(gameID) == null) {
+            if (playerColor == null || gameID == null) {
+                return new JoinGameResult("Error: bad request");
+            }
+            if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameDAO.getGame(gameID) == null) {
                 return new JoinGameResult("Error: bad request");
             }
             if (authDAO.getAuth(joinGameRequest.authToken()) == null) {
