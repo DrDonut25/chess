@@ -70,8 +70,12 @@ public class SQLAuthDAO implements AuthDAO {
     private void executeUpdate(String statement, String authToken, String username) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
             try (var ps = conn.prepareStatement(statement)) {
-                if (authToken != null) ps.setString(1, authToken);
-                if (username != null) ps.setString(2, username);
+                if (authToken != null) {
+                    ps.setString(1, authToken);
+                }
+                if (username != null) {
+                    ps.setString(2, username);
+                }
                 ps.executeUpdate();
             }
         } catch (SQLException e) {

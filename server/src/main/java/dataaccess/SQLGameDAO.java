@@ -116,8 +116,12 @@ public class SQLGameDAO implements GameDAO {
             try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     var param  = params[i];
-                    if (param instanceof Integer id) ps.setInt(i + 1, id);
-                    else if (param instanceof String p) ps.setString(i + 1, p);
+                    if (param instanceof Integer id) {
+                        ps.setInt(i + 1, id);
+                    }
+                    else if (param instanceof String p) {
+                        ps.setString(i + 1, p);
+                    }
                 }
                 ps.executeUpdate();
                 var rs = ps.getGeneratedKeys();
