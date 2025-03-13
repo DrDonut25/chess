@@ -2,9 +2,12 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
 
+import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 
 public class SQLGameDAO implements GameDAO {
     public SQLGameDAO() throws DataAccessException {
@@ -13,12 +16,35 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public Integer createGame(String gameName) throws DataAccessException{
-        return 0;
+        var statement = "INSERT INTO game (name, game) VALUES (?, ?)";
+        return executeUpdate(statement, gameName, new ChessGame());
     }
 
     @Override
     public GameData getGame(Integer gameID) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            var statement = "SELECT id, white_username, black_username, name, game FROM game WHERE id=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setInt(1, gameID);
+                try (ResultSet rs = ps.executeQuery()) {
+                    if (rs.next()) {
+                        String whiteUsername = rs.getString("white_username");
+                        String blackUsername = rs.getString("black_username");
+                        String name = rs.getString("name");
+                        ChessGame game = readGame(rs);
+                        return new GameData(gameID, whiteUsername, blackUsername, name, game);
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to get auth: %s", e.getMessage()));
+        }
         return null;
+    }
+
+    private ChessGame readGame(ResultSet rs) throws SQLException {
+        var json = rs.getString("game");
+        return new Gson().fromJson(json, ChessGame.class);
     }
 
     @Override
@@ -50,13 +76,11 @@ public class SQLGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection()) {
             String createGameTable = """
                     CREATE TABLE IF NOT EXISTS game (
-                    id INTEGER NOT NULL,
-                    white_username VARCHAR(255) NOT NULL,
-                    black_username VARCHAR(255) NOT NULL,
+                    id INTEGER NOT NULL PRIMARY KEY AUTO_INCREMENT,
+                    white_username VARCHAR(255) DEFAULT NULL,
+                    black_username VARCHAR(255) DEFAULT NULL,
                     name VARCHAR(255) NOT NULL,
-                    game TEXT NOT NULL,
-                    PRIMARY KEY ('id')
-                    )""";
+                    game TEXT NOT NULL)""";
             try (var createTableStatement = conn.prepareStatement(createGameTable)) {
                 createTableStatement.executeUpdate();
             }
@@ -65,9 +89,9 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    private void executeUpdate(String statement, Object... params) throws DataAccessException {
+    private int executeUpdate(String statement, Object... params) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()) {
-            try (var ps = conn.prepareStatement(statement)) {
+            try (var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)) {
                 for (int i = 0; i < params.length; i++) {
                     var param  = params[i];
                     if (param instanceof Integer id) ps.setInt(i + 1, id);
@@ -78,6 +102,11 @@ public class SQLGameDAO implements GameDAO {
                     }
                 }
                 ps.executeUpdate();
+                var rs = ps.getGeneratedKeys();
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+                return 0;
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to update database: %s %s", statement, e.getMessage()));

@@ -1,9 +1,6 @@
 package dataaccess;
 
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Order;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 public class GameDAOTests {
     private static GameDAO gameDAO;
@@ -29,25 +26,35 @@ public class GameDAOTests {
     @Test
     @Order(1)
     public void successCreateGame() {
-
+        Assertions.assertDoesNotThrow(() -> gameDAO.createGame("myGame"));
     }
 
     @Test
     @Order(2)
     public void createGameFailed() {
-
+        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.createGame(null));
     }
 
     @Test
     @Order(3)
     public void successGetGame() {
-
+        try {
+            Integer gameID = gameDAO.createGame("myGame");
+            Assertions.assertNotNull(gameDAO.getGame(gameID));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(4)
     public void getGameFailed() {
-
+        try {
+            gameDAO.createGame("myGame");
+            Assertions.assertNull(gameDAO.getGame(11));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
