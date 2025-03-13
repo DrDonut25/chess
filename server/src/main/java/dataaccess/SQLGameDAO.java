@@ -1,5 +1,7 @@
 package dataaccess;
 
+import chess.ChessGame;
+import com.google.gson.Gson;
 import model.GameData;
 
 import java.sql.SQLException;
@@ -46,7 +48,6 @@ public class SQLGameDAO implements GameDAO {
     private void configureDatabase() throws DataAccessException {
         DatabaseManager.createDatabase();
         try (var conn = DatabaseManager.getConnection()) {
-            //NOTE: createGameTable still needs implementation for ChessGame
             String createGameTable = """
                     CREATE TABLE IF NOT EXISTS game (
                     id INTEGER NOT NULL,
@@ -61,6 +62,25 @@ public class SQLGameDAO implements GameDAO {
             }
         } catch (SQLException e) {
             throw new DataAccessException(String.format("Unable to configure database: %s", e.getMessage()));
+        }
+    }
+
+    private void executeUpdate(String statement, Object... params) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()) {
+            try (var ps = conn.prepareStatement(statement)) {
+                for (int i = 0; i < params.length; i++) {
+                    var param  = params[i];
+                    if (param instanceof Integer id) ps.setInt(i + 1, id);
+                    else if (param instanceof String p) ps.setString(i + 1, p);
+                    else if (param instanceof ChessGame game) {
+                        var json = new Gson().toJson(game);
+                        ps.setString(i + 1, json);
+                    }
+                }
+                ps.executeUpdate();
+            }
+        } catch (SQLException e) {
+            throw new DataAccessException(String.format("Unable to update database: %s %s", statement, e.getMessage()));
         }
     }
 }
