@@ -3,7 +3,7 @@ package dataaccess;
 import org.junit.jupiter.api.*;
 
 public class UserDAOTests {
-    static UserDAO userDAO;
+    private static UserDAO userDAO;
 
     @BeforeAll
     public static void createUserDAO() {

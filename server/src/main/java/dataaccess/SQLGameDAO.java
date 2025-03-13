@@ -20,8 +20,12 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public boolean colorIsTaken(String playerColor, Integer gameID) {
-        return false;
+    public boolean colorIsTaken(String playerColor, Integer gameID) throws DataAccessException {
+        if (playerColor.equals("WHITE")) {
+            return getGame(gameID).whiteUsername() != null;
+        } else {
+            return getGame(gameID).blackUsername() != null;
+        }
     }
 
     @Override
