@@ -11,10 +11,6 @@ public class Server {
     private UserService userService = new UserService(new MemoryAuthDAO(), new MemoryUserDAO());
     private GameService gameService = new GameService(new MemoryAuthDAO(), new MemoryGameDAO());
 
-    public void setSQLDAO() throws DataAccessException {
-
-    }
-
     public int run(int desiredPort) {
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
