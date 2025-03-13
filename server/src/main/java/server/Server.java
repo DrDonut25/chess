@@ -8,26 +8,29 @@ import service.UserService;
 import spark.*;
 
 public class Server {
-    private UserService userService;
-    private GameService gameService;
-
-    public void setMemoryDAO() {
-        MemoryUserDAO userDAO = new MemoryUserDAO();
-        MemoryAuthDAO authDAO = new MemoryAuthDAO();
-        MemoryGameDAO gameDAO = new MemoryGameDAO();
-        this.userService = new UserService(authDAO, userDAO);
-        this.gameService = new GameService(authDAO, gameDAO);
-    }
+    private UserService userService = new UserService(new MemoryAuthDAO(), new MemoryUserDAO());
+    private GameService gameService = new GameService(new MemoryAuthDAO(), new MemoryGameDAO());
 
     public void setSQLDAO() throws DataAccessException {
-        SQLUserDAO userDAO = new SQLUserDAO();
-        SQLAuthDAO authDAO = new SQLAuthDAO();
-        SQLGameDAO gameDAO = new SQLGameDAO();
-        this.userService = new UserService(authDAO, userDAO);
-        this.gameService = new GameService(authDAO, gameDAO);
+
     }
 
     public int run(int desiredPort) {
+        UserDAO userDAO = new MemoryUserDAO();
+        AuthDAO authDAO = new MemoryAuthDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
+
+        try {
+            userDAO = new SQLUserDAO();
+            authDAO = new SQLAuthDAO();
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            System.out.println(e.getMessage());
+        }
+
+        userService = new UserService(authDAO, userDAO);
+        gameService = new GameService(authDAO, gameDAO);
+
         Spark.port(desiredPort);
 
         Spark.staticFiles.location("web");

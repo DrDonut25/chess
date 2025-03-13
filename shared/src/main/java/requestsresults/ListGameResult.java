@@ -2,5 +2,7 @@ package requestsresults;
 
 import model.GameData;
 
-public record ListGameResult(GameData[] games, String message) {
+import java.util.Collection;
+
+public record ListGameResult(Collection<GameData> games, String message) {
 }

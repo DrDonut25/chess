@@ -60,7 +60,13 @@ public class GameDAOTests {
     @Test
     @Order(5)
     public void successListGames() {
-
+        try {
+            gameDAO.createGame("gameOne");
+            gameDAO.createGame("gameTwo");
+            Assertions.assertNotEquals(0, gameDAO.listGames().size());
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
@@ -84,7 +90,7 @@ public class GameDAOTests {
     @Test
     @Order(9)
     public void successClear() {
-
+        Assertions.assertDoesNotThrow(gameDAO::clear);
     }
 
 }
