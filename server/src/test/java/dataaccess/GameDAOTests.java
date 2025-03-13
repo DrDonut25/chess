@@ -72,19 +72,29 @@ public class GameDAOTests {
     @Test
     @Order(6)
     public void listGamesFailed() {
-
+        Assertions.assertThrows(DataAccessException.class, () -> gameDAO.createGame(null));
     }
 
     @Test
     @Order(7)
     public void successUpdateGame() {
-
+        try {
+            Integer gameID = gameDAO.createGame("myGame");
+            Assertions.assertDoesNotThrow(() -> gameDAO.updateGame(gameID, "WHITE", "myUsername"));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(8)
     public void updateGameFailed() {
-
+        try {
+            Integer gameID = gameDAO.createGame("myGame");
+            Assertions.assertThrows(DataAccessException.class, () -> gameDAO.updateGame(gameID, "WHITE", null));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test

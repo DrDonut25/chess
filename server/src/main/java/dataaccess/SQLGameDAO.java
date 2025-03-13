@@ -69,7 +69,13 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public void updateGame(Integer gameID, String playerColor, String username) throws DataAccessException {
-
+        if (playerColor.equals("WHITE")) {
+            var statement = "UPDATE game SET white_username=? WHERE id=?";
+            executeUpdate(statement, username, gameID);
+        } else {
+            var statement = "UPDATE game SET black_username=? WHERE id=?";
+            executeUpdate(statement, username, gameID);
+        }
     }
 
     @Override
