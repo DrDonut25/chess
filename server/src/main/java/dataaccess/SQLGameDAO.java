@@ -17,7 +17,8 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public Integer createGame(String gameName) throws DataAccessException{
         var statement = "INSERT INTO game (name, game) VALUES (?, ?)";
-        return executeUpdate(statement, gameName, new ChessGame());
+        var json = new Gson().toJson(new ChessGame());
+        return executeUpdate(statement, gameName, json);
     }
 
     @Override
@@ -96,10 +97,6 @@ public class SQLGameDAO implements GameDAO {
                     var param  = params[i];
                     if (param instanceof Integer id) ps.setInt(i + 1, id);
                     else if (param instanceof String p) ps.setString(i + 1, p);
-                    else if (param instanceof ChessGame game) {
-                        var json = new Gson().toJson(game);
-                        ps.setString(i + 1, json);
-                    }
                 }
                 ps.executeUpdate();
                 var rs = ps.getGeneratedKeys();
