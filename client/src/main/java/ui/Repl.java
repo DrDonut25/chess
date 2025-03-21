@@ -6,9 +6,21 @@ import static ui.EscapeSequences.*;
 
 public class Repl {
     private Client client;
+    private final String serverURL;
 
     public Repl(String serverURL) {
         client = new LoginClient(serverURL, this);
+        this.serverURL = serverURL;
+    }
+
+    public void changeClient(Client client) {
+        if (client instanceof LoginClient) {
+            client = new LoginClient(serverURL, this);
+        } else if (client instanceof PostLoginClient) {
+            client = new PostLoginClient(serverURL, this);
+        } else if (client instanceof GameClient) {
+            client = new GameClient(serverURL, this);
+        }
     }
 
     public void run() {
@@ -21,7 +33,8 @@ public class Repl {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e) {
-                System.out.println(e.toString());
+                String msg = e.toString();
+                System.out.println(msg);
             }
         }
         System.out.println();

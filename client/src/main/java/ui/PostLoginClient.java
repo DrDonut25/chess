@@ -1,10 +1,10 @@
 package ui;
 
-public class ChessClient implements Client {
+public class PostLoginClient implements Client {
     private final String serverURL;
     private final Repl repl;
 
-    public ChessClient(String serverURL, Repl repl) {
+    public PostLoginClient(String serverURL, Repl repl) {
         this.serverURL = serverURL;
         this.repl = repl;
     }
