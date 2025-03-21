@@ -11,11 +11,21 @@ public class LoginClient implements Client {
 
     @Override
     public String eval(String input) {
+        try {
+
+        } catch () {
+
+        }
         return "";
     }
 
     @Override
     public String help() {
-        return "";
+        return """
+                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                login <USERNAME> <PASSWORD> - to log in existing user
+                quit - stop playing chess
+                help - list possible commands
+                """;
     }
 }

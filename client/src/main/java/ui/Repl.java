@@ -42,6 +42,12 @@ public class Repl {
     }
 
     private void printPrompt() {
-        System.out.print("\n" + ERASE_SCREEN + ">>>" + SET_TEXT_COLOR_GREEN);
+        String state = "[LOGGED_OUT]";
+        if (client instanceof PostLoginClient) {
+            state = "[LOGGED_IN]";
+        } else if (client instanceof GameClient) {
+            state = "[GAME]";
+        }
+        System.out.print("\n" + ERASE_SCREEN + state + " >>> " + SET_TEXT_COLOR_GREEN);
     }
 }

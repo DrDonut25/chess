@@ -16,6 +16,9 @@ public class GameClient implements Client {
 
     @Override
     public String help() {
-        return "";
+        return """
+                show - draw current game board
+                help - list possible commands
+                """;
     }
 }
