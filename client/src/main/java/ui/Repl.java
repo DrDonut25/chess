@@ -14,13 +14,7 @@ public class Repl {
     }
 
     public void changeClient(Client client) {
-        if (client instanceof LoginClient) {
-            client = new LoginClient(serverURL, this);
-        } else if (client instanceof PostLoginClient) {
-            client = new PostLoginClient(serverURL, this);
-        } else if (client instanceof GameClient) {
-            client = new GameClient(serverURL, this);
-        }
+        this.client = client;
     }
 
     public void run() {
@@ -32,6 +26,13 @@ public class Repl {
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (client instanceof LoginClient && (result.equals("login") || result.equals("register"))) {
+                    changeClient(new PostLoginClient(serverURL, this));
+                    this.run();
+                } else if (client instanceof PostLoginClient && (result.equals("join") || result.equals("observe"))) {
+                    changeClient(new GameClient(serverURL, this));
+                    this.run();
+                }
             } catch (Throwable e) {
                 String msg = e.toString();
                 System.out.println(msg);
