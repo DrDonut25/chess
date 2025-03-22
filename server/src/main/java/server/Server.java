@@ -33,8 +33,6 @@ public class Server {
         Spark.staticFiles.location("web");
 
         // Register your endpoints and handle exceptions here.
-
-        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.delete("/db", this::clear);
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
@@ -43,7 +41,6 @@ public class Server {
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
-        //Spark.init();
 
         Spark.awaitInitialization();
         return Spark.port();

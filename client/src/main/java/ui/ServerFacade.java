@@ -21,27 +21,38 @@ public class ServerFacade {
     }
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
-        return null;
+        String path = "/user";
+        return this.makeRequest("POST", path, registerRequest, RegisterResult.class);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
-        return null;
+        String path = "/session";
+        return this.makeRequest("POST", path, loginRequest, LoginResult.class);
     }
 
     public LogoutResult logout(String authToken) throws DataAccessException {
-        return null;
+        String path = "/session";
+        return this.makeRequest("DELETE", path, authToken, LogoutResult.class);
     }
 
     public ListGameResult listGames(String authToken) throws DataAccessException {
-        return null;
+        String path = "/game";
+        return this.makeRequest("GET", path, authToken, ListGameResult.class);
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
-        return null;
+        String path = "/game";
+        return this.makeRequest("POST", path, createGameRequest, CreateGameResult.class);
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
-        return null;
+        String path = "/game";
+        return this.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class);
+    }
+
+    public void clear() throws DataAccessException {
+        String path = "/db";
+        this.makeRequest("DELETE", path, null, null);
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
