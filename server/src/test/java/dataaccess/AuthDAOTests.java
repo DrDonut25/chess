@@ -1,5 +1,6 @@
 package dataaccess;
 
+import exception.DataAccessException;
 import org.junit.jupiter.api.*;
 
 public class AuthDAOTests {

@@ -1,5 +1,7 @@
 package ui;
 
+import exception.DataAccessException;
+
 public class LoginClient implements Client {
     private final String serverURL;
     private final Repl repl;
@@ -13,7 +15,7 @@ public class LoginClient implements Client {
     public String eval(String input) {
         try {
 
-        } catch () {
+        } catch (DataAccessException e) {
 
         }
         return "";
