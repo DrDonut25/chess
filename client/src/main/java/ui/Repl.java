@@ -6,11 +6,11 @@ import static ui.EscapeSequences.*;
 
 public class Repl {
     private Client client;
-    private final String serverURL;
+    private final String serverUrl;
 
-    public Repl(String serverURL) {
-        client = new LoginClient(serverURL, this);
-        this.serverURL = serverURL;
+    public Repl(String serverUrl) {
+        client = new LoginClient(serverUrl, this);
+        this.serverUrl = serverUrl;
     }
 
     public void changeClient(Client client) {
@@ -27,10 +27,10 @@ public class Repl {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
                 if (client instanceof LoginClient && (result.equals("login") || result.equals("register"))) {
-                    changeClient(new PostLoginClient(serverURL, this));
+                    changeClient(new PostLoginClient(serverUrl, this));
                     this.run();
                 } else if (client instanceof PostLoginClient && (result.equals("join") || result.equals("observe"))) {
-                    changeClient(new GameClient(serverURL, this));
+                    changeClient(new GameClient(serverUrl, this));
                     this.run();
                 }
             } catch (Throwable e) {

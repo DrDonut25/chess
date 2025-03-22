@@ -1,11 +1,11 @@
 package ui;
 
 public class GameClient implements Client {
-    private final String serverURL;
+    private final String serverUrl;
     private final Repl repl;
 
-    public GameClient(String serverURL, Repl repl) {
-        this.serverURL = serverURL;
+    public GameClient(String serverUrl, Repl repl) {
+        this.serverUrl = serverUrl;
         this.repl = repl;
     }
 

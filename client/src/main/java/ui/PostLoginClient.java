@@ -1,11 +1,11 @@
 package ui;
 
 public class PostLoginClient implements Client {
-    private final String serverURL;
+    private final String serverUrl;
     private final Repl repl;
 
-    public PostLoginClient(String serverURL, Repl repl) {
-        this.serverURL = serverURL;
+    public PostLoginClient(String serverUrl, Repl repl) {
+        this.serverUrl = serverUrl;
         this.repl = repl;
     }
 

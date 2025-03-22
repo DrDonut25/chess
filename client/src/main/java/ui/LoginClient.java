@@ -3,11 +3,11 @@ package ui;
 import exception.DataAccessException;
 
 public class LoginClient implements Client {
-    private final String serverURL;
+    private final String serverUrl;
     private final Repl repl;
 
-    public LoginClient(String serverURL, Repl repl) {
-        this.serverURL = serverURL;
+    public LoginClient(String serverUrl, Repl repl) {
+        this.serverUrl = serverUrl;
         this.repl = repl;
     }
 
