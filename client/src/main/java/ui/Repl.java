@@ -39,6 +39,7 @@ public class Repl {
     private void manageClientStack(String result) {
         Client client = clientStack.peek();
         //Order of Clients: Login, PostLogin, Game. Pop when moving left and push when moving right
+        //NOTE: GameClient is commented out until phase 6 --> print board whenever user joins/observes game for now
         if (client instanceof LoginClient) {
             String authToken = client.getAuthToken();
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
@@ -46,16 +47,18 @@ public class Repl {
             }
         } else if (client instanceof PostLoginClient) {
             String authToken = client.getAuthToken();
-            if (result.startsWith("Joined") || result.startsWith("Observing")) {
-                clientStack.push(new GameClient(serverUrl, authToken));
-            } else if (result.startsWith("Logged out")) {
+            if (result.startsWith("Logged out")) {
                 clientStack.pop();
             }
-        } else if (client instanceof GameClient) {
-            if (result.startsWith("Left Game")) {
-                clientStack.pop();
-            }
+//            else if (result.startsWith("Joined") || result.startsWith("Observing")) {
+//                clientStack.push(new GameClient(serverUrl, authToken));
+//            }
         }
+//        else if (client instanceof GameClient) {
+//            if (result.startsWith("Left Game")) {
+//                clientStack.pop();
+//            }
+//        }
     }
 
     private void printPrompt() {
