@@ -1,17 +1,24 @@
 package ui;
 
 import exception.DataAccessException;
+import requestsresults.*;
 
 import java.util.Arrays;
 
 public class LoginClient implements Client {
     private final String serverUrl;
     private final Repl repl;
+    private final ServerFacade server;
     private String authToken;
 
     public LoginClient(String serverUrl, Repl repl) {
+        this.server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
         this.repl = repl;
+    }
+
+    public String getAuthToken() {
+        return authToken;
     }
 
     @Override
@@ -32,14 +39,32 @@ public class LoginClient implements Client {
     }
 
     public String register(String[] params) throws DataAccessException {
-        return "";
+        if (params.length == 3) {
+            String username = params[0];
+            String password = params[1];
+            String email = params[2];
+            RegisterResult regRes = server.register(new RegisterRequest(username, password, email));
+            authToken = regRes.authToken();
+            return String.format("Registered new user %s and logged in", regRes.username());
+        } else {
+            throw new DataAccessException("Error: expected <USERNAME> <PASSWORD> <EMAIL>");
+        }
     }
 
     public String login(String[] params) throws DataAccessException {
-        return "";
+        if (params.length == 2) {
+            String username = params[0];
+            String password = params[1];
+            LoginResult loginRes = server.login(new LoginRequest(username, password));
+            authToken = loginRes.authToken();
+            return String.format("Logged in as %s", loginRes.username());
+        } else {
+            throw new DataAccessException("Error: expected <USERNAME> <PASSWORD> <EMAIL>");
+        }
     }
 
     public String logout() throws DataAccessException {
+        LogoutResult logoutRes
         return "";
     }
 

@@ -30,14 +30,14 @@ public class ServerFacade {
         return this.makeRequest("POST", path, loginRequest, LoginResult.class);
     }
 
-    public LogoutResult logout(String authToken) throws DataAccessException {
+    public LogoutResult logout() throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("DELETE", path, authToken, LogoutResult.class);
+        return this.makeRequest("DELETE", path, null, LogoutResult.class);
     }
 
-    public ListGameResult listGames(String authToken) throws DataAccessException {
+    public ListGameResult listGames() throws DataAccessException {
         String path = "/game";
-        return this.makeRequest("GET", path, authToken, ListGameResult.class);
+        return this.makeRequest("GET", path, null, ListGameResult.class);
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
