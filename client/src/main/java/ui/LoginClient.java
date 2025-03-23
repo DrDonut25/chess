@@ -64,8 +64,9 @@ public class LoginClient implements Client {
     }
 
     public String logout() throws DataAccessException {
-        LogoutResult logoutRes
-        return "";
+        LogoutResult logoutRes = server.logout();
+        authToken = null;
+        return "Logged out successfully";
     }
 
     @Override
