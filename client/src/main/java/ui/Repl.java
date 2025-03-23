@@ -46,7 +46,7 @@ public class Repl {
             }
         } else if (client instanceof PostLoginClient) {
             String authToken = client.getAuthToken();
-            if (result.startsWith("join") || result.startsWith("observe")) {
+            if (result.startsWith("Joined") || result.startsWith("Observing")) {
                 clientStack.push(new GameClient(serverUrl, authToken));
             } else if (result.startsWith("Logged out")) {
                 clientStack.pop();

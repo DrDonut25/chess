@@ -42,7 +42,7 @@ public class LoginClient implements Client {
             authToken = regRes.authToken();
             return String.format("Registered new user %s and logged in", regRes.username());
         } else {
-            throw new DataAccessException("Error: expected <USERNAME> <PASSWORD> <EMAIL>");
+            throw new DataAccessException("Error: invalid number of arguments — expected <USERNAME> <PASSWORD> <EMAIL>");
         }
     }
 
@@ -54,7 +54,7 @@ public class LoginClient implements Client {
             authToken = loginRes.authToken();
             return String.format("Logged in as %s", loginRes.username());
         } else {
-            throw new DataAccessException("Error: expected <USERNAME> <PASSWORD> <EMAIL>");
+            throw new DataAccessException("Error: invalid number of arguments — expected <USERNAME> <PASSWORD> <EMAIL>");
         }
     }
 
