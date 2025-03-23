@@ -11,7 +11,7 @@ public class Repl {
 
     public Repl(String serverUrl) {
         clientStack = new Stack<>();
-        clientStack.push(new LoginClient(serverUrl, this));
+        clientStack.push(new LoginClient(serverUrl));
         this.serverUrl = serverUrl;
     }
 
@@ -42,12 +42,12 @@ public class Repl {
         if (client instanceof LoginClient) {
             String authToken = client.getAuthToken();
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
-                clientStack.push(new PostLoginClient(serverUrl, this, authToken));
+                clientStack.push(new PostLoginClient(serverUrl, authToken));
             }
         } else if (client instanceof PostLoginClient) {
             String authToken = client.getAuthToken();
             if (result.startsWith("join") || result.startsWith("observe")) {
-                clientStack.push(new GameClient(serverUrl, this, authToken));
+                clientStack.push(new GameClient(serverUrl, authToken));
             } else if (result.startsWith("Logged out")) {
                 clientStack.pop();
             }

@@ -6,15 +6,11 @@ import requestsresults.*;
 import java.util.Arrays;
 
 public class LoginClient implements Client {
-    private final String serverUrl;
-    private final Repl repl;
     private final ServerFacade server;
     private String authToken;
 
-    public LoginClient(String serverUrl, Repl repl) {
+    public LoginClient(String serverUrl) {
         this.server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
-        this.repl = repl;
     }
 
     public String getAuthToken() {
@@ -30,7 +26,6 @@ public class LoginClient implements Client {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
-                case "logout" -> logout();
                 default -> help();
             };
         } catch (DataAccessException e) {
@@ -63,18 +58,12 @@ public class LoginClient implements Client {
         }
     }
 
-    public String logout() throws DataAccessException {
-        LogoutResult logoutRes = server.logout();
-        authToken = null;
-        return "Logged out successfully";
-    }
-
     @Override
     public String help() {
         return """
                 register <USERNAME> <PASSWORD> <EMAIL> - to create an account
                 login <USERNAME> <PASSWORD> - to log in existing user
-                quit - stop playing chess
+                quit - exit program
                 help - list possible commands
                 """;
     }

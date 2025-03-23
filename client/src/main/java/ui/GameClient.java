@@ -1,13 +1,11 @@
 package ui;
 
 public class GameClient implements Client {
-    private final String serverUrl;
-    private final Repl repl;
+    private final ServerFacade server;
     private String authToken;
 
-    public GameClient(String serverUrl, Repl repl, String authToken) {
-        this.serverUrl = serverUrl;
-        this.repl = repl;
+    public GameClient(String serverUrl, String authToken) {
+        server = new ServerFacade(serverUrl);
         this.authToken = authToken;
     }
 
@@ -24,7 +22,12 @@ public class GameClient implements Client {
     @Override
     public String help() {
         return """
-                show - draw current game board
+                redraw - draw current game board
+                leave - leave current game
+                make_move <START_POSITION> <END_POSITION> - move chess piece
+                resign - forfeit game (will not leave game)
+                legal_moves <POSITION> - highlights legal moves at specified position
+                quit - exit program
                 help - list possible commands
                 """;
     }
