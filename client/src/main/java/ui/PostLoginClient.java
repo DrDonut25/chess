@@ -117,8 +117,36 @@ public class PostLoginClient implements Client {
         throw new DataAccessException("Error: invalid game ID");
     }
 
+    /*
+      a b c d e f g h
+    8 r n b q k b n r 8
+    7 p p p p p p p p 7
+    6                 6
+    5                 5
+    4                 4
+    3                 3
+    2 P P P P P P P P 2
+    1 R N B Q K B N R 1
+      a b c d e f g h
+     */
     private String drawBoard(boolean isWhiteOriented, ChessGame game) {
-        return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("a b c d e f g h\n");
+        if (isWhiteOriented) {
+            for (int i = 8; i > 0; i--) {
+                sb.append(i);
+                //Read ChessGame contents, printing relevant pieces on current row
+                sb.append(i).append("\n");
+            }
+        } else {
+            for (int i = 1; i <= 8; i++) {
+                sb.append(i);
+                //Read ChessGame contents, printing relevant pieces on current row
+                sb.append(i).append("\n");
+            }
+        }
+        sb.append("a b c d e f g h");
+        return sb.toString();
     }
 
     @Override
