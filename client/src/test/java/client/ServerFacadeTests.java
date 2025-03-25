@@ -1,8 +1,6 @@
 import exception.DataAccessException;
 import org.junit.jupiter.api.*;
-import requestsresults.LoginRequest;
-import requestsresults.RegisterRequest;
-import requestsresults.RegisterResult;
+import requestsresults.*;
 import server.Server;
 import ui.ServerFacade;
 
@@ -19,11 +17,6 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         String serverURL = "http://localhost:" + port;
         facade = new ServerFacade(serverURL);
-        try {
-            facade.clear();
-        } catch (DataAccessException e) {
-            throw new AssertionError(e.getMessage());
-        }
     }
 
     @AfterAll
@@ -31,6 +24,14 @@ public class ServerFacadeTests {
         server.stop();
     }
 
+    @AfterEach
+    void clear() {
+        try {
+            facade.clear();
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
+    }
 
     @Test
     @Order(0)
@@ -74,55 +75,98 @@ public class ServerFacadeTests {
     @Test
     @Order(4)
     public void loginFailed() {
-        Assertions.assertTrue(true);
+        LoginRequest logReq = new LoginRequest("Fred", "Fredrocks");
+        Assertions.assertThrows(DataAccessException.class, () -> facade.login(logReq).message());
     }
 
     @Test
     @Order(5)
     public void successLogout() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            Assertions.assertDoesNotThrow(() -> facade.logout(regRes.authToken()));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(6)
     public void logoutFailed() {
-        Assertions.assertTrue(true);
+        Assertions.assertThrows(DataAccessException.class, () -> facade.logout("badAuth"));
     }
 
     @Test
     @Order(7)
     public void successListGames() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            Assertions.assertDoesNotThrow(() -> facade.listGames(regRes.authToken()));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(8)
     public void listGamesFailed() {
-        Assertions.assertTrue(true);
+        Assertions.assertThrows(DataAccessException.class, () -> facade.listGames("badAuth"));
     }
 
     @Test
     @Order(9)
     public void successCreateGame() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            String authToken = regRes.authToken();
+            CreateGameRequest createReq = new CreateGameRequest(authToken, "FredGame");
+            facade.createGame(createReq);
+            Assertions.assertNotEquals(facade.listGames(authToken).games().size(), 0);
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(10)
     public void createGameFailed() {
-        Assertions.assertTrue(true);
+        CreateGameRequest createReq = new CreateGameRequest("badAuth", "myGame");
+        Assertions.assertThrows(DataAccessException.class, () -> facade.createGame(createReq));
     }
 
     @Test
     @Order(11)
     public void successJoinGame() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            String authToken = regRes.authToken();
+            CreateGameRequest createReq = new CreateGameRequest(authToken, "FredGame");
+            CreateGameResult createRes = facade.createGame(createReq);
+            JoinGameRequest joinReq = new JoinGameRequest(authToken,"WHITE", createRes.gameID());
+            Assertions.assertDoesNotThrow(() -> facade.joinGame(joinReq));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(12)
     public void joinGameFailed() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            String authToken = regRes.authToken();
+            CreateGameRequest createReq = new CreateGameRequest(authToken, "FredGame");
+            CreateGameResult createRes = facade.createGame(createReq);
+            JoinGameRequest joinReq = new JoinGameRequest(authToken,"BLUE", createRes.gameID());
+            Assertions.assertThrows(DataAccessException.class, () -> facade.joinGame(joinReq));
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test

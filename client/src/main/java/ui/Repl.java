@@ -6,7 +6,7 @@ import java.util.Stack;
 import static ui.EscapeSequences.*;
 
 public class Repl {
-    private Stack<Client> clientStack;
+    private final Stack<Client> clientStack;
     private final String serverUrl;
 
     public Repl(String serverUrl) {
