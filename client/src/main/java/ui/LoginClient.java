@@ -26,6 +26,7 @@ public class LoginClient implements Client {
             return switch (cmd) {
                 case "register" -> register(params);
                 case "login" -> login(params);
+                case "quit" -> "Exiting program";
                 default -> help();
             };
         } catch (DataAccessException e) {

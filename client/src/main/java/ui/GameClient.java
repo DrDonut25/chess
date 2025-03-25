@@ -30,6 +30,7 @@ public class GameClient implements Client {
                 case "make_move" -> makeMove(params);
                 case "legal_moves" -> legalMoves(params);
                 case "resign" -> resign();
+                case "quit" -> "Exiting program";
                 default -> help();
             };
         } catch (DataAccessException e) {

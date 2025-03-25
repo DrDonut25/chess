@@ -1,4 +1,8 @@
+import exception.DataAccessException;
 import org.junit.jupiter.api.*;
+import requestsresults.LoginRequest;
+import requestsresults.RegisterRequest;
+import requestsresults.RegisterResult;
 import server.Server;
 import ui.ServerFacade;
 
@@ -32,19 +36,34 @@ public class ServerFacadeTests {
     @Test
     @Order(1)
     public void successRegister() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            RegisterResult regRes = facade.register(regReq);
+            Assertions.assertFalse(regRes.authToken().isEmpty());
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
     @Order(2)
     public void registerFailed() {
-        Assertions.assertTrue(true);
+        RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", null);
+        Assertions.assertThrows(DataAccessException.class, () -> facade.register(regReq));
     }
 
     @Test
     @Order(3)
     public void successLogin() {
-        Assertions.assertTrue(true);
+        try {
+            RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
+            facade.register(regReq);
+            facade.logout();
+            LoginRequest logReq = new LoginRequest("Fred", "Fredrocks");
+            Assertions.assertNull(facade.login(logReq).message());
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @Test
@@ -104,6 +123,6 @@ public class ServerFacadeTests {
     @Test
     @Order(13)
     public void successClear() {
-        Assertions.assertTrue(true);
+        Assertions.assertDoesNotThrow(facade::clear);
     }
 }

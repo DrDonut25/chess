@@ -40,6 +40,7 @@ public class PostLoginClient implements Client {
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout();
+                case "quit" -> "Exiting program";
                 default -> help();
             };
         } catch (DataAccessException e) {
