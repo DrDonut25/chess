@@ -13,8 +13,8 @@ public class BoardSketcher {
         String newLine = resetColors + "\n";
         String labelFont = EscapeSequences.SET_BG_COLOR_BLUE + EscapeSequences.SET_TEXT_COLOR_BLACK;
         if (isWhiteOriented) {
-            String columnText = " a  b   c  d   e  f   g   h ";
-            String columnLabels = labelFont + EscapeSequences.EMPTY + columnText + EscapeSequences.EMPTY;
+            String columnText = " a\u2003 b\u2003 c\u2003 d\u2003 e\u2003 f\u2003 g\u2003 h";
+            String columnLabels = labelFont + EscapeSequences.EMPTY + columnText + "    ";
             sb.append(columnLabels).append(newLine);
             for (int row = 8; row > 0; row--) {
                 sb.append(labelFont).append(" ").append(String.format("%d ", row));
@@ -30,10 +30,10 @@ public class BoardSketcher {
                 sb.append(labelFont).append(" ").append(String.format("%d ", row));
                 sb.append(newLine);
             }
-            sb.append(columnLabels).append(resetColors);
+            sb.append(columnLabels).append(resetColors).append(newLine);
         } else {
-            String columnText = " h  g   f  e   d  b   c   a ";
-            String columnLabels = labelFont + EscapeSequences.EMPTY + columnText + EscapeSequences.EMPTY;
+            String columnText = " h\u2003 g\u2003 f\u2003 e\u2003 d\u2003 b\u2003 c\u2003 a";
+            String columnLabels = labelFont + EscapeSequences.EMPTY + columnText + "    ";
             sb.append(columnLabels).append(newLine);
             for (int row = 1; row <= 8; row++) {
                 sb.append(labelFont).append(" ").append(String.format("%d ", row));
@@ -49,7 +49,7 @@ public class BoardSketcher {
                 sb.append(labelFont).append(" ").append(String.format("%d ", row));
                 sb.append(newLine);
             }
-            sb.append(columnLabels).append(resetColors);
+            sb.append(columnLabels).append(resetColors).append(newLine);
         }
         return sb.toString();
     }
