@@ -13,7 +13,6 @@ public class GameClient implements Client {
         this.authToken = authToken;
     }
 
-    @Override
     public String getAuthToken() {
         return authToken;
     }

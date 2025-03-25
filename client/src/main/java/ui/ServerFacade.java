@@ -22,45 +22,53 @@ public class ServerFacade {
 
     public RegisterResult register(RegisterRequest registerRequest) throws DataAccessException {
         String path = "/user";
-        return this.makeRequest("POST", path, registerRequest, RegisterResult.class);
+        return this.makeRequest("POST", path, registerRequest, RegisterResult.class, null);
     }
 
     public LoginResult login(LoginRequest loginRequest) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("POST", path, loginRequest, LoginResult.class);
+        return this.makeRequest("POST", path, loginRequest, LoginResult.class, null);
     }
 
-    public LogoutResult logout() throws DataAccessException {
+    public LogoutResult logout(String authToken) throws DataAccessException {
         String path = "/session";
-        return this.makeRequest("DELETE", path, null, LogoutResult.class);
+        return this.makeRequest("DELETE", path, null, LogoutResult.class, authToken);
     }
 
-    public ListGameResult listGames() throws DataAccessException {
+    public ListGameResult listGames(String authToken) throws DataAccessException {
         String path = "/game";
-        return this.makeRequest("GET", path, null, ListGameResult.class);
+        return this.makeRequest("GET", path, null, ListGameResult.class, authToken);
     }
 
     public CreateGameResult createGame(CreateGameRequest createGameRequest) throws DataAccessException {
         String path = "/game";
-        return this.makeRequest("POST", path, createGameRequest, CreateGameResult.class);
+        String authToken = createGameRequest.authToken();
+        createGameRequest = new CreateGameRequest(null, createGameRequest.gameName());
+        return this.makeRequest("POST", path, createGameRequest, CreateGameResult.class, authToken);
     }
 
     public JoinGameResult joinGame(JoinGameRequest joinGameRequest) throws DataAccessException {
         String path = "/game";
-        return this.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class);
+        String authToken = joinGameRequest.authToken();
+        joinGameRequest = new JoinGameRequest(null, joinGameRequest.playerColor(), joinGameRequest.gameID());
+        return this.makeRequest("PUT", path, joinGameRequest, JoinGameResult.class, authToken);
     }
 
     public void clear() throws DataAccessException {
         String path = "/db";
-        this.makeRequest("DELETE", path, null, null);
+        this.makeRequest("DELETE", path, null, null, null);
     }
 
-    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
+
+            if (authToken != null) {
+                http.addRequestProperty("authorization", authToken);
+            }
 
             writeBody(request, http);
             http.connect();

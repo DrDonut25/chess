@@ -23,7 +23,6 @@ public class PostLoginClient implements Client {
         this.authToken = authToken;
     }
 
-    @Override
     public String getAuthToken() {
         return authToken;
     }
@@ -49,7 +48,7 @@ public class PostLoginClient implements Client {
     }
 
     public String logout() throws DataAccessException {
-        server.logout();
+        server.logout(authToken);
         authToken = null;
         return "Logged out successfully";
     }
@@ -65,7 +64,7 @@ public class PostLoginClient implements Client {
     }
 
     public String listGames() throws DataAccessException {
-        ListGameResult listGameResult = server.listGames();
+        ListGameResult listGameResult = server.listGames(authToken);
         Collection<GameData> games = listGameResult.games();
         var result = new StringBuilder();
         result.append("Listed Games in format: <ID> -> <GAME_NAME>: <WHITE_USERNAME> vs. <BLACK_USERNAME>\n");
@@ -111,7 +110,7 @@ public class PostLoginClient implements Client {
     }
 
     private ChessGame getGame(Integer gameID) throws DataAccessException {
-        ListGameResult listGameResult = server.listGames();
+        ListGameResult listGameResult = server.listGames(authToken);
         Collection<GameData> games = listGameResult.games();
         for (GameData game: games) {
             if (Objects.equals(game.gameID(), gameID)) {

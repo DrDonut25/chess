@@ -19,6 +19,11 @@ public class ServerFacadeTests {
         System.out.println("Started test HTTP server on " + port);
         String serverURL = "http://localhost:" + port;
         facade = new ServerFacade(serverURL);
+        try {
+            facade.clear();
+        } catch (DataAccessException e) {
+            throw new AssertionError(e.getMessage());
+        }
     }
 
     @AfterAll
@@ -57,8 +62,8 @@ public class ServerFacadeTests {
     public void successLogin() {
         try {
             RegisterRequest regReq = new RegisterRequest("Fred", "Fredrocks", "fred@email.com");
-            facade.register(regReq);
-            facade.logout();
+            RegisterResult regRes = facade.register(regReq);
+            facade.logout(regRes.authToken());
             LoginRequest logReq = new LoginRequest("Fred", "Fredrocks");
             Assertions.assertNull(facade.login(logReq).message());
         } catch (DataAccessException e) {

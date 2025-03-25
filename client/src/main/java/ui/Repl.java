@@ -18,9 +18,9 @@ public class Repl {
     public void run() {
         Scanner scanner = new Scanner(System.in);
         String result = "";
-        Client client = clientStack.peek();
         //exit program if "quit" is typed in at any time, otherwise continue running Repl loop
         while (!result.equals("quit")) {
+            Client client = clientStack.peek();
             printPrompt();
             String line = scanner.nextLine();
             try {
