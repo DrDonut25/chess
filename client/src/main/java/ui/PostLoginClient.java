@@ -1,6 +1,9 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessPiece;
+import chess.ChessPosition;
 import exception.DataAccessException;
 import model.GameData;
 import requestsresults.CreateGameRequest;
@@ -117,36 +120,68 @@ public class PostLoginClient implements Client {
         throw new DataAccessException("Error: invalid game ID");
     }
 
-    /*
-      a b c d e f g h
-    8 r n b q k b n r 8
-    7 p p p p p p p p 7
-    6                 6
-    5                 5
-    4                 4
-    3                 3
-    2 P P P P P P P P 2
-    1 R N B Q K B N R 1
-      a b c d e f g h
-     */
     private String drawBoard(boolean isWhiteOriented, ChessGame game) {
+        ChessBoard board = game.getBoard();
         StringBuilder sb = new StringBuilder();
-        sb.append("a b c d e f g h\n");
         if (isWhiteOriented) {
-            for (int i = 8; i > 0; i--) {
-                sb.append(i);
+            sb.append("a b c d e f g h\n");
+            for (int row = 8; row > 0; row--) {
+                sb.append(String.format("%d ", row));
                 //Read ChessGame contents, printing relevant pieces on current row
-                sb.append(i).append("\n");
+                for (int col = 1; col <= 8; col++) {
+                    printPiece(sb, board, row, col);
+                }
+                sb.append(String.format("%d ", row)).append("\n");
+            }
+            sb.append("a b c d e f g h");
+        } else {
+            sb.append("h g f e d c b a\n");
+            for (int row = 1; row <= 8; row++) {
+                sb.append(String.format("%d ", row));
+                //Read ChessGame contents, printing relevant pieces on current row
+                for (int col = 1; col <= 8; col++) {
+                    printPiece(sb, board, 9 - row, 9 - col);
+                }
+                sb.append(String.format("%d ", row)).append("\n");
+            }
+            sb.append("h g f e d c b a");
+        }
+        return sb.toString();
+    }
+
+    private void printPiece(StringBuilder sb, ChessBoard board, int row, int col) {
+        ChessPiece piece = board.getPiece(new ChessPosition(row, col));
+        if (piece == null) {
+            sb.append(" ");
+        } else if (piece.getTeamColor() == ChessGame.TeamColor.WHITE) {
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                sb.append(EscapeSequences.BLACK_PAWN);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                sb.append(EscapeSequences.BLACK_ROOK);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                sb.append(EscapeSequences.BLACK_KNIGHT);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+                sb.append(EscapeSequences.BLACK_BISHOP);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+                sb.append(EscapeSequences.BLACK_QUEEN);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.KING) {
+                sb.append(EscapeSequences.BLACK_KING);
             }
         } else {
-            for (int i = 1; i <= 8; i++) {
-                sb.append(i);
-                //Read ChessGame contents, printing relevant pieces on current row
-                sb.append(i).append("\n");
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                sb.append(EscapeSequences.WHITE_PAWN);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.ROOK) {
+                sb.append(EscapeSequences.WHITE_ROOK);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.KNIGHT) {
+                sb.append(EscapeSequences.WHITE_KNIGHT);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.BISHOP) {
+                sb.append(EscapeSequences.WHITE_BISHOP);
+            } else if (piece.getPieceType() == ChessPiece.PieceType.QUEEN) {
+                sb.append(EscapeSequences.WHITE_QUEEN);
+            } else {
+                sb.append(EscapeSequences.WHITE_KING);
             }
         }
-        sb.append("a b c d e f g h");
-        return sb.toString();
     }
 
     @Override
