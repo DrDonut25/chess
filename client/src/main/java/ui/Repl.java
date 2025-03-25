@@ -49,19 +49,10 @@ public class Repl {
                 clientStack.push(new PostLoginClient(serverUrl, authToken));
             }
         } else if (client instanceof PostLoginClient) {
-            String authToken = client.getAuthToken();
             if (result.startsWith("Logged out")) {
                 clientStack.pop();
             }
-//            else if (result.startsWith("Joined") || result.startsWith("Observing")) {
-//                clientStack.push(new GameClient(serverUrl, authToken));
-//            }
         }
-//        else if (client instanceof GameClient) {
-//            if (result.startsWith("Left Game")) {
-//                clientStack.pop();
-//            }
-//        }
     }
 
     private void printPrompt() {
