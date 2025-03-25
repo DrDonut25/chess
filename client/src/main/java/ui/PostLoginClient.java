@@ -83,14 +83,13 @@ public class PostLoginClient implements Client {
             Integer gameID = Integer.valueOf(params[0]);
             String playerColor = params[1].toUpperCase();
             server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
-            var result = new StringBuilder();
+            StringBuilder result = new StringBuilder();
             result.append(String.format("Joined game %s as team %s", gameID, playerColor));
             result.append("\n");
-            if (playerColor.equals("BLACK")) {
-                result.append(BoardSketcher.drawBoard(false, getGame(gameID)));
-            } else {
-                result.append(BoardSketcher.drawBoard(true, getGame(gameID)));
-            }
+
+            result.append(BoardSketcher.drawBoard(true, getGame(gameID)));
+            result.append(BoardSketcher.drawBoard(false, getGame(gameID)));
+
             return result.toString();
         } else {
             throw new DataAccessException("Error: invalid number of arguments — expected <ID> <WHITE|BLACK>");
