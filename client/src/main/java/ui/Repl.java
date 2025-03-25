@@ -26,6 +26,9 @@ public class Repl {
             try {
                 result = client.eval(line);
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
+                if (result.equals("Exiting program")) {
+                    break;
+                }
                 manageClientStack(result);
             } catch (Throwable e) {
                 String msg = e.toString();
