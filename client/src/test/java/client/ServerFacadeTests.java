@@ -4,7 +4,7 @@ import exception.DataAccessException;
 import org.junit.jupiter.api.*;
 import requestsresults.*;
 import server.Server;
-import ui.ServerFacade;
+import web.ServerFacade;
 
 
 public class ServerFacadeTests {

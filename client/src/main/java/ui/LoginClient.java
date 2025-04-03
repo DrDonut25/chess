@@ -2,6 +2,7 @@ package ui;
 
 import exception.DataAccessException;
 import requestsresults.*;
+import web.ServerFacade;
 
 import java.util.Arrays;
 

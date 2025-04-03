@@ -6,6 +6,7 @@ import model.GameData;
 import requestsresults.CreateGameRequest;
 import requestsresults.JoinGameRequest;
 import requestsresults.ListGameResult;
+import web.ServerFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
