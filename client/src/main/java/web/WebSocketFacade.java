@@ -10,11 +10,11 @@ import javax.websocket.Session;
 import javax.websocket.WebSocketContainer;
 import java.net.URI;
 
-public class WebsocketCommunicator {
+public class WebSocketFacade {
     private final Session session;
     private final ServerMessageObserver messageObserver;
 
-    public WebsocketCommunicator(String url, ServerMessageObserver observer) throws DataAccessException {
+    public WebSocketFacade(String url, ServerMessageObserver observer) throws DataAccessException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");

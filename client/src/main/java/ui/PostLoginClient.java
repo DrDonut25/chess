@@ -17,8 +17,8 @@ public class PostLoginClient implements Client {
     private final ServerFacade server;
     private String authToken;
 
-    public PostLoginClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) {
-        server = new ServerFacade(serverUrl, messageObserver);
+    public PostLoginClient(String serverUrl, String authToken) {
+        server = new ServerFacade(serverUrl);
         this.authToken = authToken;
     }
 
@@ -89,9 +89,6 @@ public class PostLoginClient implements Client {
                 StringBuilder result = new StringBuilder();
                 result.append(String.format("Joined game %s as team %s", gameID, playerColor));
                 result.append("\n");
-
-                result.append(BoardSketcher.drawBoard(true, getGame(gameID)));
-                result.append(BoardSketcher.drawBoard(false, getGame(gameID)));
 
                 return result.toString();
             } catch (NumberFormatException e) {

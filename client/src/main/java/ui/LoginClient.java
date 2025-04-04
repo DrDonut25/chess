@@ -11,7 +11,7 @@ public class LoginClient implements Client {
     private String authToken;
 
     public LoginClient(String serverUrl) {
-        this.server = new ServerFacade(serverUrl, null);
+        this.server = new ServerFacade(serverUrl);
     }
 
     public String getAuthToken() {

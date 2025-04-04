@@ -3,15 +3,16 @@ package ui;
 import exception.DataAccessException;
 import web.ServerFacade;
 import web.ServerMessageObserver;
+import web.WebSocketFacade;
 
 import java.util.Arrays;
 
 public class GameClient implements Client {
-    private final ServerFacade server;
+    private final WebSocketFacade websocket;
     private String authToken;
 
-    public GameClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) {
-        server = new ServerFacade(serverUrl, messageObserver);
+    public GameClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) throws DataAccessException {
+        websocket = new WebSocketFacade(serverUrl, messageObserver);
         this.authToken = authToken;
     }
 

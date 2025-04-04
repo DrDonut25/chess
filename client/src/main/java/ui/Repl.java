@@ -1,5 +1,6 @@
 package ui;
 
+import exception.DataAccessException;
 import web.ServerMessageObserver;
 import websocket.messages.NotificationMessage;
 
@@ -42,12 +43,12 @@ public class Repl implements ServerMessageObserver {
     }
 
     //Switches Repl's client if a certain endpoint is called by pushing/popping to/from the stack
-    private void manageClientStack(String result) {
+    private void manageClientStack(String result) throws DataAccessException {
         Client client = clientStack.peek();
         //Order of Clients: Login, PostLogin, Game. Pop when moving left and push when moving right
         if (client instanceof LoginClient) {
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
-                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken(), this));
+                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken()));
             }
         } else if (client instanceof PostLoginClient) {
             if (result.startsWith("Logged out")) {
