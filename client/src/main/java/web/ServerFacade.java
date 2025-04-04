@@ -15,6 +15,7 @@ import java.util.HashMap;
 
 public class ServerFacade {
     String serverUrl;
+    ServerMessageObserver messageObserver;
 
     public ServerFacade (String serverUrl) {
         this.serverUrl = serverUrl;
