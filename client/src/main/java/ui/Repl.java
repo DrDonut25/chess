@@ -1,11 +1,14 @@
 package ui;
 
+import web.ServerMessageObserver;
+import websocket.messages.ServerMessage;
+
 import java.util.Scanner;
 import java.util.Stack;
 
 import static ui.EscapeSequences.*;
 
-public class Repl {
+public class Repl implements ServerMessageObserver {
     private final Stack<Client> clientStack;
     private final String serverUrl;
 
@@ -57,6 +60,12 @@ public class Repl {
                 clientStack.pop();
             }
         }
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message.getMessage());
+        printPrompt();
     }
 
     private void printPrompt() {
