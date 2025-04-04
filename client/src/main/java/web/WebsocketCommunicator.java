@@ -2,7 +2,7 @@ package web;
 
 import com.google.gson.Gson;
 import exception.DataAccessException;
-import websocket.messages.ServerMessage;
+import websocket.messages.NotificationMessage;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
@@ -11,8 +11,8 @@ import javax.websocket.WebSocketContainer;
 import java.net.URI;
 
 public class WebsocketCommunicator {
-    private Session session;
-    private ServerMessageObserver messageObserver;
+    private final Session session;
+    private final ServerMessageObserver messageObserver;
 
     public WebsocketCommunicator(String url, ServerMessageObserver observer) throws DataAccessException {
         try {
@@ -24,8 +24,8 @@ public class WebsocketCommunicator {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    ServerMessage serverMessage = new Gson().fromJson(message, ServerMessage.class);
-                    messageObserver.notify(serverMessage);
+                    NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
+                    messageObserver.notify(notification);
                 }
             });
         } catch (Exception e) {

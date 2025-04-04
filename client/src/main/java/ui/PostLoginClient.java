@@ -7,6 +7,7 @@ import requestsresults.CreateGameRequest;
 import requestsresults.JoinGameRequest;
 import requestsresults.ListGameResult;
 import web.ServerFacade;
+import web.ServerMessageObserver;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,8 +17,8 @@ public class PostLoginClient implements Client {
     private final ServerFacade server;
     private String authToken;
 
-    public PostLoginClient(String serverUrl, String authToken) {
-        server = new ServerFacade(serverUrl);
+    public PostLoginClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) {
+        server = new ServerFacade(serverUrl, messageObserver);
         this.authToken = authToken;
     }
 

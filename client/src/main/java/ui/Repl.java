@@ -1,7 +1,7 @@
 package ui;
 
 import web.ServerMessageObserver;
-import websocket.messages.ServerMessage;
+import websocket.messages.NotificationMessage;
 
 import java.util.Scanner;
 import java.util.Stack;
@@ -47,13 +47,13 @@ public class Repl implements ServerMessageObserver {
         //Order of Clients: Login, PostLogin, Game. Pop when moving left and push when moving right
         if (client instanceof LoginClient) {
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
-                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken()));
+                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken(), this));
             }
         } else if (client instanceof PostLoginClient) {
             if (result.startsWith("Logged out")) {
                 clientStack.pop();
             } else if (result.startsWith("Joined")) {
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken()));
+                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), this));
             }
         } else if (client instanceof GameClient) {
             if (result.startsWith("Resigned") || result.startsWith("Left")) {
@@ -63,7 +63,7 @@ public class Repl implements ServerMessageObserver {
     }
 
     @Override
-    public void notify(ServerMessage message) {
+    public void notify(NotificationMessage message) {
         System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message.getMessage());
         printPrompt();
     }

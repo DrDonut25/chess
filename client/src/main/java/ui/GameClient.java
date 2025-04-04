@@ -2,6 +2,7 @@ package ui;
 
 import exception.DataAccessException;
 import web.ServerFacade;
+import web.ServerMessageObserver;
 
 import java.util.Arrays;
 
@@ -9,8 +10,8 @@ public class GameClient implements Client {
     private final ServerFacade server;
     private String authToken;
 
-    public GameClient(String serverUrl, String authToken) {
-        server = new ServerFacade(serverUrl);
+    public GameClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) {
+        server = new ServerFacade(serverUrl, messageObserver);
         this.authToken = authToken;
     }
 
