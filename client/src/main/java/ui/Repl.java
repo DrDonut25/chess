@@ -54,6 +54,7 @@ public class Repl implements ServerMessageObserver {
             if (result.startsWith("Logged out")) {
                 clientStack.pop();
             } else if (result.startsWith("Joined")) {
+                boolean isWhite = result.contains("WHITE");
                 clientStack.push(new GameClient(serverUrl, client.getAuthToken(), this));
             }
         } else if (client instanceof GameClient) {

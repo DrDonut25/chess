@@ -12,8 +12,8 @@ public class GameClient implements Client {
     private String authToken;
 
     public GameClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) throws DataAccessException {
-        websocket = new WebSocketFacade(serverUrl, messageObserver);
         this.authToken = authToken;
+        websocket = new WebSocketFacade(serverUrl, messageObserver);
     }
 
     public String getAuthToken() {
