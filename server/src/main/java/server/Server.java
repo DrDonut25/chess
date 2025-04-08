@@ -12,7 +12,8 @@ import spark.*;
 public class Server {
     private UserService userService = new UserService(new MemoryAuthDAO(), new MemoryUserDAO());
     private GameService gameService = new GameService(new MemoryAuthDAO(), new MemoryGameDAO());
-    private final WebSocketHandler webSocketHandler = new WebSocketHandler();
+    private WebSocketHandler webSocketHandler;
+
 
     public int run(int desiredPort) {
         UserDAO userDAO = new MemoryUserDAO();
@@ -29,6 +30,8 @@ public class Server {
 
         userService = new UserService(authDAO, userDAO);
         gameService = new GameService(authDAO, gameDAO);
+
+        webSocketHandler = new WebSocketHandler(authDAO, gameDAO);
 
         Spark.port(desiredPort);
 

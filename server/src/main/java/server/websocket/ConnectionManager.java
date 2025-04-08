@@ -19,7 +19,11 @@ public class ConnectionManager {
         connections.remove(username);
     }
 
-    public void sendMessage(String excludeUsername, ServerMessage message) throws IOException {
+    public void sendMessage(ServerMessage message) {
+
+    }
+
+    public void broadcast(String excludeUsername, ServerMessage message) throws IOException {
         ArrayList<Connection> removeList = new ArrayList<>();
         for (Connection connection: connections.values()) {
             if (connection.session.isOpen()) {
