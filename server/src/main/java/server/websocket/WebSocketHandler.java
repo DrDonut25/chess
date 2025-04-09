@@ -53,8 +53,8 @@ public class WebSocketHandler {
             String message = username + " joined the game";
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(username, notification);
-            //Add user to ChessGame - How to add observer?
-            gameDAO.updateGame(command.getGameID(), "", username);
+            //Observer code?
+
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -65,6 +65,8 @@ public class WebSocketHandler {
         String pos2 = "";
         String message = String.format("%s made a move: %s to %s", username, pos1, pos2);
         //Update ChessGame (maybe move this up to the top?)
+
+        //Notify user if in check
     }
 
     public void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
@@ -76,7 +78,6 @@ public class WebSocketHandler {
     }
 
     public void resign(Session session, String username, UserGameCommand command) throws IOException {
-        connections.remove(username);
         String message = username + " forfeited the game";
         NotificationMessage notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
