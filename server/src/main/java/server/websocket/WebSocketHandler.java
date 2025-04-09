@@ -6,12 +6,14 @@ import dataaccess.GameDAO;
 import exception.DataAccessException;
 import model.GameData;
 import org.eclipse.jetty.util.IO;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import javax.imageio.IIOException;
 import java.io.IOException;
@@ -29,6 +31,7 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) throws IOException {
+
         try {
             UserGameCommand gameCommand = new Gson().fromJson(msg, UserGameCommand.class);
             String username = getUsername(gameCommand.getAuthToken());
@@ -39,7 +42,7 @@ public class WebSocketHandler {
                 case RESIGN -> resign(session, username, gameCommand);
             }
         } catch (DataAccessException e) {
-            connections.sendMessage(new ErrorMessage("Error: Unauthorized"));
+            session.getRemote().sendString("Error: Unauthorized");
         }
     }
 

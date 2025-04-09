@@ -10,6 +10,10 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ConnectionManager {
     private ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
+    public Connection getConnection(String username) {
+        return connections.get(username);
+    }
+
     public void add(String username, Session session) {
         Connection connection  = new Connection(username, session);
         connections.put(username, connection);
