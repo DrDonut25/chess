@@ -4,12 +4,16 @@ import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import exception.DataAccessException;
+import org.eclipse.jetty.util.IO;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ErrorMessage;
-import websocket.messages.ServerMessage;
+import websocket.messages.NotificationMessage;
+
+import javax.imageio.IIOException;
+import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
@@ -23,7 +27,7 @@ public class WebSocketHandler {
     }
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String msg) {
+    public void onMessage(Session session, String msg) throws IOException {
         try {
             UserGameCommand gameCommand = new Gson().fromJson(msg, UserGameCommand.class);
             String username = getUsername(gameCommand.getAuthToken());
@@ -42,8 +46,11 @@ public class WebSocketHandler {
         return authDAO.getAuth(authToken).username();
     }
 
-    public void connect(Session session, String username, UserGameCommand command) {
-
+    public void connect(Session session, String username, UserGameCommand command) throws IOException {
+        connections.add(username, session);
+        String message = username + " joined the game";
+        NotificationMessage notification = new NotificationMessage(message);
+        connections.broadcast(username, notification);
     }
 
     public void makeMove(Session session, String username, MakeMoveCommand command) {
