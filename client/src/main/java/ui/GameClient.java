@@ -8,12 +8,16 @@ import web.WebSocketFacade;
 import java.util.Arrays;
 
 public class GameClient implements Client {
-    private final WebSocketFacade websocket;
+    private WebSocketFacade websocket;
     private String authToken;
+    private Integer gameID;
+    private boolean isObserving;
 
-    public GameClient(String serverUrl, String authToken, ServerMessageObserver messageObserver) throws DataAccessException {
-        this.authToken = authToken;
-        websocket = new WebSocketFacade(serverUrl, messageObserver);
+    public GameClient(String url, String auth, Integer gameID, ServerMessageObserver observer, boolean observing) throws DataAccessException {
+        this.authToken = auth;
+        this.gameID = gameID;
+        this.isObserving = observing;
+        websocket = new WebSocketFacade(url, observer);
     }
 
     public String getAuthToken() {
@@ -26,15 +30,24 @@ public class GameClient implements Client {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch (cmd) {
-                case "redraw" -> redraw(params);
-                case "leave" -> leave();
-                case "make_move" -> makeMove(params);
-                case "legal_moves" -> legalMoves(params);
-                case "resign" -> resign();
-                case "quit" -> "Exiting program";
-                default -> help();
-            };
+            if (!isObserving) {
+                return switch (cmd) {
+                    case "redraw" -> redraw(params);
+                    case "leave" -> leave();
+                    case "make_move" -> makeMove(params);
+                    case "legal_moves" -> legalMoves(params);
+                    case "resign" -> resign();
+                    case "quit" -> "Exiting program";
+                    default -> help();
+                };
+            } else {
+                return switch (cmd) {
+                    case "redraw" -> redraw(params);
+                    case "leave" -> leave();
+                    case "quit" -> "Exiting program";
+                    default -> help();
+                };
+            }
         } catch (DataAccessException e) {
             return e.getMessage();
         }
@@ -45,7 +58,9 @@ public class GameClient implements Client {
     }
 
     public String leave() throws DataAccessException {
-        return "";
+        websocket.leave(authToken, gameID);
+        websocket = null;
+        return String.format("Left game %d", gameID);
     }
 
     public String makeMove(String[] params) throws DataAccessException {
@@ -62,7 +77,8 @@ public class GameClient implements Client {
 
     @Override
     public String help() {
-        return """
+        if (!isObserving) {
+            return """
                 redraw - draw current game board
                 leave - leave current game
                 make_move <START_POSITION> <END_POSITION> - move chess piece
@@ -71,5 +87,13 @@ public class GameClient implements Client {
                 quit - exit program
                 help - list possible commands
                 """;
+        } else {
+            return """
+                redraw - draw current game board
+                leave - stop observing current game
+                quit - exit program
+                help - list possible commands
+                """;
+        }
     }
 }

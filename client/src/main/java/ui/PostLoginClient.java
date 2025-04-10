@@ -7,7 +7,6 @@ import requestsresults.CreateGameRequest;
 import requestsresults.JoinGameRequest;
 import requestsresults.ListGameResult;
 import web.ServerFacade;
-import web.ServerMessageObserver;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -16,6 +15,7 @@ import java.util.Objects;
 public class PostLoginClient implements Client {
     private final ServerFacade server;
     private String authToken;
+    private Integer gameID;
 
     public PostLoginClient(String serverUrl, String authToken) {
         server = new ServerFacade(serverUrl);
@@ -24,6 +24,10 @@ public class PostLoginClient implements Client {
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    public Integer getGameID() {
+        return gameID;
     }
 
     @Override
@@ -86,11 +90,10 @@ public class PostLoginClient implements Client {
                 Integer gameID = Integer.valueOf(params[0]);
                 String playerColor = params[1].toUpperCase();
                 server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
-                StringBuilder result = new StringBuilder();
-                result.append(String.format("Joined game %s as team %s", gameID, playerColor));
-                result.append("\n");
 
-                return result.toString();
+                //Make WebSocket Connection
+
+                return String.format("Joined game %s as team %s\n", gameID, playerColor);
             } catch (NumberFormatException e) {
                 throw new DataAccessException("Error: passed ID is not a number");
             }
@@ -103,7 +106,10 @@ public class PostLoginClient implements Client {
         if (params.length == 1) {
             try {
                 Integer gameID = Integer.valueOf(params[0]);
-                return BoardSketcher.drawBoard(true, getGame(gameID));
+
+                //Make WebSocket Connection
+
+                return String.format("Observing game %s\n", gameID);
             } catch (NumberFormatException e) {
                 throw new DataAccessException("Error: passed ID is not a number");
             }
