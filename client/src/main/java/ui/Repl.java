@@ -1,9 +1,10 @@
 package ui;
 
+import chess.ChessGame;
 import exception.DataAccessException;
 import model.GameData;
 import web.ServerMessageObserver;
-import websocket.messages.NotificationMessage;
+import websocket.messages.*;
 
 import java.util.Scanner;
 import java.util.Stack;
@@ -69,9 +70,31 @@ public class Repl implements ServerMessageObserver {
     }
 
     @Override
-    public void notify(NotificationMessage message) {
-        System.out.println(EscapeSequences.SET_TEXT_COLOR_RED + message.getMessage());
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification((NotificationMessage) message);
+            case ERROR -> displayError((ErrorMessage) message);
+            case LOAD_GAME -> loadGame((LoadGameMessage) message);
+        }
         printPrompt();
+    }
+
+    @Override
+    public void displayNotification(NotificationMessage notification) {
+        System.out.println(SET_TEXT_COLOR_YELLOW + notification.getMessage());
+    }
+
+    @Override
+    public void displayError(ErrorMessage errorMessage) {
+        System.out.println(SET_TEXT_COLOR_RED + errorMessage.getMessage());
+    }
+
+    @Override
+    public void loadGame(LoadGameMessage gameMessage) {
+        GameData gameData = gameMessage.getGame();
+        ChessGame game = gameData.game();
+        //figure out how to orient the board
+        BoardSketcher.drawBoard(true, game);
     }
 
     private void printPrompt() {
