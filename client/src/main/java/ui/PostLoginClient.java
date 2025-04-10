@@ -7,27 +7,34 @@ import requestsresults.CreateGameRequest;
 import requestsresults.JoinGameRequest;
 import requestsresults.ListGameResult;
 import web.ServerFacade;
+import web.ServerMessageObserver;
+import web.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
 public class PostLoginClient implements Client {
+    private final String serverUrl;
     private final ServerFacade server;
+    private WebSocketFacade websocket;
+    private final ServerMessageObserver messageObserver;
     private String authToken;
-    private Integer gameID;
+    private GameData game;
 
-    public PostLoginClient(String serverUrl, String authToken) {
+    public PostLoginClient(String serverUrl, String authToken, ServerMessageObserver observer) {
+        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
         this.authToken = authToken;
+        this.messageObserver = observer;
     }
 
     public String getAuthToken() {
         return authToken;
     }
 
-    public Integer getGameID() {
-        return gameID;
+    public GameData getGame() {
+        return game;
     }
 
     @Override
@@ -92,6 +99,8 @@ public class PostLoginClient implements Client {
                 server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
 
                 //Make WebSocket Connection
+                websocket = new WebSocketFacade(serverUrl, messageObserver);
+                websocket.connect(authToken, gameID);
 
                 return String.format("Joined game %s as team %s\n", gameID, playerColor);
             } catch (NumberFormatException e) {

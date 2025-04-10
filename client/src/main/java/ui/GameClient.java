@@ -1,6 +1,7 @@
 package ui;
 
 import exception.DataAccessException;
+import model.GameData;
 import web.ServerFacade;
 import web.ServerMessageObserver;
 import web.WebSocketFacade;
@@ -10,12 +11,12 @@ import java.util.Arrays;
 public class GameClient implements Client {
     private WebSocketFacade websocket;
     private String authToken;
-    private Integer gameID;
+    private GameData game;
     private boolean isObserving;
 
-    public GameClient(String url, String auth, Integer gameID, ServerMessageObserver observer, boolean observing) throws DataAccessException {
+    public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing) throws DataAccessException {
         this.authToken = auth;
-        this.gameID = gameID;
+        this.game = game;
         this.isObserving = observing;
         websocket = new WebSocketFacade(url, observer);
     }
@@ -54,7 +55,8 @@ public class GameClient implements Client {
     }
 
     public String redraw(String[] params) throws DataAccessException {
-        return "";
+
+        return BoardSketcher.drawBoard();
     }
 
     public String leave() throws DataAccessException {

@@ -1,6 +1,7 @@
 package ui;
 
 import exception.DataAccessException;
+import model.GameData;
 import web.ServerMessageObserver;
 import websocket.messages.NotificationMessage;
 
@@ -48,17 +49,17 @@ public class Repl implements ServerMessageObserver {
         //Order of Clients: Login, PostLogin, Game. Pop when moving left and push when moving right
         if (client instanceof LoginClient) {
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
-                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken()));
+                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken(), this));
             }
         } else if (client instanceof PostLoginClient) {
             if (result.startsWith("Logged out")) {
                 clientStack.pop();
             } else if (result.startsWith("Joined")) {
-                Integer gameID = ((PostLoginClient) client).getGameID();
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), gameID, this, false));
+                GameData game = null;
+                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false));
             } else if (result.startsWith("Observing")) {
-                Integer gameID = ((PostLoginClient) client).getGameID();
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), gameID, this, true));
+                GameData game = null;
+                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, true));
             }
         } else if (client instanceof GameClient) {
             if (result.startsWith("Resigned") || result.startsWith("Left")) {
