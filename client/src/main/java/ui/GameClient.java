@@ -55,14 +55,13 @@ public class GameClient implements Client {
     }
 
     public String redraw(String[] params) throws DataAccessException {
-
-        return BoardSketcher.drawBoard();
+        return "";
     }
 
     public String leave() throws DataAccessException {
-        websocket.leave(authToken, gameID);
+        websocket.leave(authToken, game.gameID());
         websocket = null;
-        return String.format("Left game %d", gameID);
+        return String.format("Left game %d", game.gameID());
     }
 
     public String makeMove(String[] params) throws DataAccessException {
