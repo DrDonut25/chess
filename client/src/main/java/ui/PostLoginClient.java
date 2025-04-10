@@ -1,6 +1,5 @@
 package ui;
 
-import chess.ChessGame;
 import exception.DataAccessException;
 import model.GameData;
 import requestsresults.CreateGameRequest;
@@ -98,7 +97,7 @@ public class PostLoginClient implements Client {
                 String playerColor = params[1].toUpperCase();
                 server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
 
-                gameData = findGame(gameID);
+                storeCurrentGameData(gameID);
 
                 //Make WebSocket Connection
                 websocket = new WebSocketFacade(serverUrl, messageObserver);
@@ -117,7 +116,7 @@ public class PostLoginClient implements Client {
         if (params.length == 1) {
             try {
                 Integer gameID = Integer.valueOf(params[0]);
-                gameData = findGame(gameID);
+                storeCurrentGameData(gameID);
 
                 //Make WebSocket Connection
                 websocket = new WebSocketFacade(serverUrl, messageObserver);
@@ -132,12 +131,13 @@ public class PostLoginClient implements Client {
         }
     }
 
-    private GameData findGame(Integer gameID) throws DataAccessException {
+    private void storeCurrentGameData(Integer gameID) throws DataAccessException {
         ListGameResult listGameResult = server.listGames(authToken);
         Collection<GameData> games = listGameResult.games();
         for (GameData game: games) {
             if (Objects.equals(game.gameID(), gameID)) {
-                return game;
+                gameData = game;
+                return;
             }
         }
         throw new DataAccessException("Error: invalid game ID");

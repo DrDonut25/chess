@@ -2,7 +2,6 @@ package ui;
 
 import exception.DataAccessException;
 import model.GameData;
-import web.ServerFacade;
 import web.ServerMessageObserver;
 import web.WebSocketFacade;
 
@@ -10,19 +9,30 @@ import java.util.Arrays;
 
 public class GameClient implements Client {
     private WebSocketFacade websocket;
-    private String authToken;
+    private final String authToken;
     private GameData gameData;
-    private boolean isObserving;
+    private final boolean isObserving;
+    private boolean isWhiteOriented;
 
     public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing) throws DataAccessException {
         this.authToken = auth;
         this.gameData = game;
         this.isObserving = observing;
+        setBoardOrientation();
         websocket = new WebSocketFacade(url, observer);
     }
 
     public String getAuthToken() {
         return authToken;
+    }
+
+    private void setBoardOrientation() {
+        isWhiteOriented = true;
+        if (!isObserving) {
+            //Find if player is on black team --> set isWhiteOriented to false
+
+            isWhiteOriented = false;
+        }
     }
 
     @Override
@@ -33,7 +43,7 @@ public class GameClient implements Client {
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
             if (!isObserving) {
                 return switch (cmd) {
-                    case "redraw" -> redraw(params);
+                    case "redraw" -> redraw();
                     case "leave" -> leave();
                     case "make_move" -> makeMove(params);
                     case "legal_moves" -> legalMoves(params);
@@ -43,7 +53,7 @@ public class GameClient implements Client {
                 };
             } else {
                 return switch (cmd) {
-                    case "redraw" -> redraw(params);
+                    case "redraw" -> redraw();
                     case "leave" -> leave();
                     case "quit" -> "Exiting program";
                     default -> help();
@@ -54,9 +64,9 @@ public class GameClient implements Client {
         }
     }
 
-    public String redraw(String[] params) throws DataAccessException {
+    public String redraw() throws DataAccessException {
         //Can I use my approach from phase 5? Or do I need to ask for a LoadGameMessage?
-        return "";
+        return BoardSketcher.drawBoard(isWhiteOriented, gameData.game());
     }
 
     public String leave() throws DataAccessException {
@@ -66,15 +76,25 @@ public class GameClient implements Client {
     }
 
     public String makeMove(String[] params) throws DataAccessException {
+        //Call makeMove method in WebSocketFacade
+        //Update ChessGame to reflect the move you just made (also WebSocketFacade?)
+        //Broadcast to all players/observers that you made a move (also WebSocketFacade?)
+        //Redraw updated board?
         return "";
     }
 
     public String legalMoves(String[] params) throws DataAccessException {
+        //Maybe create additional method in BoardSketcher class that handles printing board with highlighted tiles
+        //Create Collection of ChessPositions that are valid positions to move to, then pass to BoardSketcher class ^
+
         return "";
     }
 
     public String resign() throws DataAccessException {
-        return "";
+        //End game. Consider adding gameOver boolean to ChessGame class
+        //Do above step in WebSocketFacade?
+        websocket.resign(authToken, gameData.gameID());
+        return "Resigned the game. You lose!";
     }
 
     @Override
