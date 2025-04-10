@@ -93,8 +93,7 @@ public class Repl implements ServerMessageObserver {
     public void loadGame(LoadGameMessage gameMessage) {
         GameData gameData = gameMessage.getGame();
         ChessGame game = gameData.game();
-        //figure out how to orient the board
-        BoardSketcher.drawBoard(true, game);
+        BoardSketcher.drawBoard(gameMessage.isWhiteOriented(), game);
     }
 
     private void printPrompt() {
