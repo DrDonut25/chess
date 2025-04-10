@@ -20,7 +20,7 @@ public class PostLoginClient implements Client {
     private WebSocketFacade websocket;
     private final ServerMessageObserver messageObserver;
     private String authToken;
-    private GameData game;
+    private GameData gameData;
 
     public PostLoginClient(String serverUrl, String authToken, ServerMessageObserver observer) {
         this.serverUrl = serverUrl;
@@ -33,8 +33,8 @@ public class PostLoginClient implements Client {
         return authToken;
     }
 
-    public GameData getGame() {
-        return game;
+    public GameData getGameData() {
+        return gameData;
     }
 
     @Override
@@ -98,6 +98,8 @@ public class PostLoginClient implements Client {
                 String playerColor = params[1].toUpperCase();
                 server.joinGame(new JoinGameRequest(authToken, playerColor, gameID));
 
+                gameData = findGame(gameID);
+
                 //Make WebSocket Connection
                 websocket = new WebSocketFacade(serverUrl, messageObserver);
                 websocket.connect(authToken, gameID);
@@ -115,8 +117,11 @@ public class PostLoginClient implements Client {
         if (params.length == 1) {
             try {
                 Integer gameID = Integer.valueOf(params[0]);
+                gameData = findGame(gameID);
 
                 //Make WebSocket Connection
+                websocket = new WebSocketFacade(serverUrl, messageObserver);
+                websocket.connect(authToken, gameID);
 
                 return String.format("Observing game %s\n", gameID);
             } catch (NumberFormatException e) {
@@ -127,12 +132,12 @@ public class PostLoginClient implements Client {
         }
     }
 
-    private ChessGame getGame(Integer gameID) throws DataAccessException {
+    private GameData findGame(Integer gameID) throws DataAccessException {
         ListGameResult listGameResult = server.listGames(authToken);
         Collection<GameData> games = listGameResult.games();
         for (GameData game: games) {
             if (Objects.equals(game.gameID(), gameID)) {
-                return game.game();
+                return game;
             }
         }
         throw new DataAccessException("Error: invalid game ID");

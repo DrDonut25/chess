@@ -3,12 +3,13 @@ package websocket.messages;
 import model.GameData;
 
 public class LoadGameMessage extends ServerMessage {
-    private GameData game;
-    private boolean isWhiteOriented;
+    private final GameData game;
+    private final boolean isWhiteOriented;
 
-    public LoadGameMessage(GameData game) {
+    public LoadGameMessage(GameData game, boolean isWhiteOriented) {
         super(ServerMessageType.LOAD_GAME);
         this.game = game;
+        this.isWhiteOriented = isWhiteOriented;
     }
 
     public GameData getGame() {

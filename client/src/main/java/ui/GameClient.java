@@ -11,12 +11,12 @@ import java.util.Arrays;
 public class GameClient implements Client {
     private WebSocketFacade websocket;
     private String authToken;
-    private GameData game;
+    private GameData gameData;
     private boolean isObserving;
 
     public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing) throws DataAccessException {
         this.authToken = auth;
-        this.game = game;
+        this.gameData = game;
         this.isObserving = observing;
         websocket = new WebSocketFacade(url, observer);
     }
@@ -55,13 +55,14 @@ public class GameClient implements Client {
     }
 
     public String redraw(String[] params) throws DataAccessException {
+        //Can I use my approach from phase 5? Or do I need to ask for a LoadGameMessage?
         return "";
     }
 
     public String leave() throws DataAccessException {
-        websocket.leave(authToken, game.gameID());
+        websocket.leave(authToken, gameData.gameID());
         websocket = null;
-        return String.format("Left game %d", game.gameID());
+        return String.format("Left game %d", gameData.gameID());
     }
 
     public String makeMove(String[] params) throws DataAccessException {
