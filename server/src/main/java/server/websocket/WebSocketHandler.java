@@ -148,7 +148,7 @@ public class WebSocketHandler {
             Integer gameID = command.getGameID();
             GameData gameData = gameService.getGame(gameID);
             if (gameData.whiteUsername().equals(username)) {
-                gameService.updateGame(gameID, "WHITE", null);
+                gameService.deletePlayer(gameID, "WHITE", null);
             } else if (gameData.blackUsername().equals(username)) {
                 gameService.updateGame(gameID, "BLACK", null);
             }
@@ -165,10 +165,20 @@ public class WebSocketHandler {
     }
 
     public void resign(String username, UserGameCommand command) throws DataAccessException {
-        //End ChessGame—do NOT remove the resigning user
+        //Get game
         Integer gameID = command.getGameID();
-        ChessGame game = gameService.getGame(gameID).game();
+        GameData gameData = gameService.getGame(gameID);
+        ChessGame game = gameData.game();
+        //Prevent observers from resigning
+        if (!gameData.whiteUsername().equals(username) && !gameData.blackUsername().equals(username)) {
+            throw new DataAccessException("Error: Observers cannot resign/forfeit the game");
+        }
+        //Prevent players from resigning twice
+        if (game.isGameOver()) {
+            throw new DataAccessException("Error: Game has already been forfeited");
+        }
         game.resign();
+        //End ChessGame—do NOT remove the resigning user
         gameService.updateBoard(gameID, game);
         try {
             //Notify ALL clients that game has been forfeited
