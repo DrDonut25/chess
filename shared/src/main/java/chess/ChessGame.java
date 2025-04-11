@@ -14,6 +14,7 @@ public class ChessGame {
 
     private TeamColor teamTurn;
     private ChessBoard board;
+    private boolean gameOver;
 
     public ChessGame() {
         teamTurn = TeamColor.WHITE;
@@ -24,7 +25,17 @@ public class ChessGame {
     public ChessGame(ChessGame game) {
         this.teamTurn = game.teamTurn;
         board = new ChessBoard(game.board);
+        gameOver = false;
     }
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void resign() {
+        gameOver = true;
+    }
+
     /**
      * @return Which team's turn it is
      */
@@ -157,7 +168,12 @@ public class ChessGame {
         if (!this.isInCheck(teamColor)) {
             return false;
         } else {
-            return noValidMoves(teamColor);
+            if (noValidMoves(teamColor)) {
+                gameOver = true;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 
@@ -173,7 +189,12 @@ public class ChessGame {
         if (this.isInCheck(teamColor)) {
             return false;
         } else {
-            return noValidMoves(teamColor);
+            if (noValidMoves(teamColor)) {
+                gameOver = true;
+                return true;
+            } else {
+                return false;
+            }
         }
     }
 

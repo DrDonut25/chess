@@ -1,6 +1,7 @@
 package dataaccess;
 
 import chess.ChessGame;
+import exception.DataAccessException;
 import model.GameData;
 
 import java.util.ArrayList;
@@ -55,6 +56,15 @@ public class MemoryGameDAO implements GameDAO {
             ChessGame game = oldGame.game();
             games.put(gameID, new GameData(gameID, whiteUsername, username, gameName, game));
         }
+    }
+
+    @Override
+    public void updateBoard(Integer gameID, ChessGame game) {
+        GameData oldGame = games.get(gameID);
+        String whiteUsername = oldGame.whiteUsername();
+        String blackUsername = oldGame.blackUsername();
+        String gameName = oldGame.gameName();
+        games.put(gameID, new GameData(gameID, whiteUsername, blackUsername, gameName, game));
     }
 
     public void clear() {

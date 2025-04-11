@@ -1,5 +1,7 @@
 package chess;
 
+import exception.DataAccessException;
+
 import java.util.Objects;
 
 /**
@@ -36,6 +38,29 @@ public class ChessPosition {
 
     public boolean isValidPosition() {
         return (row <= 8 && row >= 1) && (col <= 8 && col >= 1);
+    }
+
+    public String toCoordString() {
+        StringBuilder sb = new StringBuilder();
+        if (col == 1) {
+            sb.append("a");
+        } else if (col == 2) {
+            sb.append("b");
+        } else if (col == 3) {
+            sb.append("c");
+        } else if (col == 4) {
+            sb.append("d");
+        } else if (col == 5) {
+            sb.append("e");
+        } else if (col == 6) {
+            sb.append("f");
+        } else if (col == 7) {
+            sb.append("g");
+        } else {
+            sb.append("h");
+        }
+        sb.append(row);
+        return sb.toString();
     }
 
     @Override

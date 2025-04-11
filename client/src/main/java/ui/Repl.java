@@ -1,10 +1,7 @@
 package ui;
 
-import chess.ChessGame;
 import exception.DataAccessException;
 import model.GameData;
-import web.ServerMessageObserver;
-import websocket.messages.*;
 
 import java.util.Scanner;
 import java.util.Stack;

@@ -1,5 +1,9 @@
 package server.websocket;
 
+import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
@@ -54,9 +58,9 @@ public class WebSocketHandler {
             //Create/send LoadGameMessage back to messaging client
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-
-            //Notify all OTHER clients that user joined the game
+            //Add user to Connection Map
             connections.add(username, session);
+            //Notify all OTHER clients that user joined the game
             String message = username + " joined the game";
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(username, notification);
@@ -65,16 +69,28 @@ public class WebSocketHandler {
         }
     }
 
-    public void makeMove(Session session, String username, MakeMoveCommand command) {
-        String pos1 = "";
-        String pos2 = "";
-        //Make sure move is valid-- Call validMoves in Phase 1 code?
-        String message = String.format("%s made a move: %s to %s", username, pos1, pos2);
+    public void makeMove(Session session, String username, MakeMoveCommand command) throws DataAccessException {
+        //Get ChessMove and convert coordinates to letter-number format
+        ChessMove move = command.getMove();
+        ChessPosition pos1 = move.getStartPosition();
+        ChessPosition pos2 = move.getEndPosition();
+        String startPos = pos1.toCoordString();
+        String endPos = pos2.toCoordString();
+        Integer gameID = command.getGameID();
+        //Make sure move is valid-- Call makeMove in Phase 1 code
+        GameData gameData = gameDAO.getGame(gameID);
+        ChessGame game = gameData.game();
+        try {
+            game.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new DataAccessException(e.getMessage());
+        }
         //Update ChessGame
 
         //Send LoadGameMessage to ALL clients
 
         //Send NotificationMessage to all OTHER clients spelling out what move was made
+        String message = String.format("%s made a move: %s to %s", username, startPos, endPos);
 
         //Notify ALL clients if in check/checkmate/stalemate
 
