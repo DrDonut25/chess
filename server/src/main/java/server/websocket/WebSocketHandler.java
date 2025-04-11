@@ -9,8 +9,10 @@ import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import exception.DataAccessException;
 import model.GameData;
+import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
+import service.GameService;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.*;
@@ -20,12 +22,10 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
     private final ConnectionManager connections = new ConnectionManager();
-    private final AuthDAO authDAO;
-    private final GameDAO gameDAO;
+    private final GameService gameService;
 
     public WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
-        this.authDAO = authDAO;
-        this.gameDAO = gameDAO;
+        this.gameService = new GameService(authDAO, gameDAO);
     }
 
     @OnWebSocketMessage
@@ -40,19 +40,23 @@ public class WebSocketHandler {
                 case RESIGN -> resign(username, gameCommand);
             }
         } catch (DataAccessException e) {
-            session.getRemote().sendString("Error: Unauthorized");
+            sendMessage(session.getRemote(), new ErrorMessage(e.getMessage()));
         }
     }
 
+    private void sendMessage(RemoteEndpoint remoteEndpoint, ErrorMessage errorMessage) throws IOException {
+        remoteEndpoint.sendString(new Gson().toJson(errorMessage));
+    }
+
     private String getUsername(String authToken) throws DataAccessException {
-        return authDAO.getAuth(authToken).username();
+        return gameService.getAuth(authToken).username();
     }
 
     public void connect(Session session, String username, UserGameCommand command) throws DataAccessException {
         try {
             //Get GameData
             Integer gameID = command.getGameID();
-            GameData gameData = gameDAO.getGame(gameID);
+            GameData gameData = gameService.getGame(gameID);
             //Figure out board orientation
             boolean isWhiteOriented = !gameData.blackUsername().equals(username);
             //Create/send LoadGameMessage back to messaging client
@@ -78,7 +82,7 @@ public class WebSocketHandler {
         String endPos = pos2.toCoordString();
         Integer gameID = command.getGameID();
         //Make sure move is valid-- Call makeMove in Phase 1 code
-        GameData gameData = gameDAO.getGame(gameID);
+        GameData gameData = gameService.getGame(gameID);
         ChessGame game = gameData.game();
         try {
             game.makeMove(move);
@@ -86,7 +90,7 @@ public class WebSocketHandler {
             throw new DataAccessException(e.getMessage());
         }
         //Update ChessGame
-        gameDAO.updateBoard(gameID, game);
+        gameService.updateBoard(gameID, game);
         //Figure out boardOrientation
         boolean isWhiteOriented = !gameData.blackUsername().equals(username);
         //Send relevant ServerMessages
@@ -127,11 +131,11 @@ public class WebSocketHandler {
         try {
             //Remove user from ChessGame (if client is observer, do nothing
             Integer gameID = command.getGameID();
-            GameData gameData = gameDAO.getGame(gameID);
+            GameData gameData = gameService.getGame(gameID);
             if (gameData.whiteUsername().equals(username)) {
-                gameDAO.updateGame(gameID, "WHITE", null);
+                gameService.updateGame(gameID, "WHITE", null);
             } else if (gameData.blackUsername().equals(username)) {
-                gameDAO.updateGame(gameID, "BLACK", null);
+                gameService.updateGame(gameID, "BLACK", null);
             }
             //Remove client's connection from ConnectionManager
             connections.remove(username);
@@ -148,9 +152,9 @@ public class WebSocketHandler {
     public void resign(String username, UserGameCommand command) throws DataAccessException {
         //End ChessGame—do NOT remove the resigning user
         Integer gameID = command.getGameID();
-        ChessGame game = gameDAO.getGame(gameID).game();
+        ChessGame game = gameService.getGame(gameID).game();
         game.resign();
-        gameDAO.updateBoard(gameID, game);
+        gameService.updateBoard(gameID, game);
         try {
             //Notify ALL clients that game has been forfeited
             String message = username + " forfeited the game!";
