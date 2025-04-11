@@ -7,14 +7,16 @@ import model.GameData;
 import web.ServerMessageObserver;
 import web.WebSocketFacade;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 
 public class GameClient implements Client {
     private WebSocketFacade websocket;
     private final String authToken;
     private GameData gameData;
     private final boolean isObserving;
-    private boolean isWhiteOriented;
+    private final boolean isWhiteOriented;
 
     public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing, boolean isWhite) throws DataAccessException {
         this.authToken = auth;
@@ -59,7 +61,7 @@ public class GameClient implements Client {
 
     public String redraw() throws DataAccessException {
         //Can I use my approach from phase 5? Or do I need to ask for a LoadGameMessage?
-        return BoardSketcher.drawBoard(isWhiteOriented, gameData.game());
+        return BoardSketcher.drawBoard(isWhiteOriented, gameData.game(), null);
     }
 
     public String leave() throws DataAccessException {
@@ -119,13 +121,13 @@ public class GameClient implements Client {
 
     public String legalMoves(String[] params) throws DataAccessException {
         if (params.length == 1) {
-            String position = params[0];
-            return BoardSketcher.drawLegalMoves(isWhiteOriented, gameData.game(), toChessPosition(position));
+            ChessPosition position = toChessPosition(params[0]);
+            //Create Collection of ChessPositions that are legal positions to move to then pass to drawBoard
+            Collection<ChessMove> legalMoves = gameData.game().validMoves(position);
+            return BoardSketcher.drawBoard(isWhiteOriented, gameData.game(), legalMoves);
         } else {
             throw new DataAccessException("Error: invalid number of arguments — expected <POSITION>");
         }
-        //Maybe create additional method in BoardSketcher class that handles printing board with highlighted tiles
-        //Create Collection of ChessPositions that are valid positions to move to, then pass to BoardSketcher class?
     }
 
     public String resign() throws DataAccessException {

@@ -16,8 +16,8 @@ import java.io.IOException;
 @WebSocket
 public class WebSocketHandler {
     private ConnectionManager connections = new ConnectionManager();
-    private AuthDAO authDAO;
-    private GameDAO gameDAO;
+    private final AuthDAO authDAO;
+    private final GameDAO gameDAO;
 
     public WebSocketHandler(AuthDAO authDAO, GameDAO gameDAO) {
         this.authDAO = authDAO;
