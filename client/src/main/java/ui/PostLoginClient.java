@@ -6,21 +6,17 @@ import requestsresults.CreateGameRequest;
 import requestsresults.JoinGameRequest;
 import requestsresults.ListGameResult;
 import web.ServerFacade;
-import web.ServerMessageObserver;
-import web.WebSocketFacade;
 
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
 public class PostLoginClient implements Client {
-    private final String serverUrl;
     private final ServerFacade server;
     private String authToken;
     private GameData gameData;
 
     public PostLoginClient(String serverUrl, String authToken) {
-        this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
         this.authToken = authToken;
     }
