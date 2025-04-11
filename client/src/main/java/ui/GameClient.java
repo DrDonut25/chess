@@ -1,29 +1,38 @@
 package ui;
 
+import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import exception.DataAccessException;
 import model.GameData;
 import web.ServerMessageObserver;
 import web.WebSocketFacade;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 
-public class GameClient implements Client {
+import static ui.EscapeSequences.SET_TEXT_COLOR_RED;
+import static ui.EscapeSequences.SET_TEXT_COLOR_YELLOW;
+
+public class GameClient implements Client, ServerMessageObserver {
     private WebSocketFacade websocket;
     private final String authToken;
     private GameData gameData;
     private final boolean isObserving;
     private final boolean isWhiteOriented;
 
-    public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing, boolean isWhite) throws DataAccessException {
+    public GameClient(String url, String auth, GameData game, boolean observing, boolean isWhite) throws DataAccessException {
         this.authToken = auth;
         this.gameData = game;
         this.isObserving = observing;
         this.isWhiteOriented = isWhite;
-        websocket = new WebSocketFacade(url, observer);
+        //Make WebSocket connection
+        websocket = new WebSocketFacade(url, this);
+        websocket.connect(authToken, gameData.gameID());
     }
 
     public String getAuthToken() {
@@ -157,5 +166,32 @@ public class GameClient implements Client {
                 help - list possible commands
                 """;
         }
+    }
+
+    @Override
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()) {
+            case NOTIFICATION -> displayNotification((NotificationMessage) message);
+            case ERROR -> displayError((ErrorMessage) message);
+            case LOAD_GAME -> loadGame((LoadGameMessage) message);
+        }
+    }
+
+    @Override
+    public void displayNotification(NotificationMessage notification) {
+        System.out.println(SET_TEXT_COLOR_YELLOW + notification.getMessage());
+    }
+
+    @Override
+    public void displayError(ErrorMessage errorMessage) {
+        System.out.println(SET_TEXT_COLOR_RED + errorMessage.getMessage());
+    }
+
+    @Override
+    public void loadGame(LoadGameMessage gameMessage) {
+        GameData gameData = gameMessage.getGame();
+        this.gameData = gameData;
+        ChessGame game = gameData.game();
+        BoardSketcher.drawBoard(gameMessage.isWhiteOriented(), game, null);
     }
 }

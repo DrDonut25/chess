@@ -16,16 +16,13 @@ import java.util.Objects;
 public class PostLoginClient implements Client {
     private final String serverUrl;
     private final ServerFacade server;
-    private WebSocketFacade websocket;
-    private final ServerMessageObserver messageObserver;
     private String authToken;
     private GameData gameData;
 
-    public PostLoginClient(String serverUrl, String authToken, ServerMessageObserver observer) {
+    public PostLoginClient(String serverUrl, String authToken) {
         this.serverUrl = serverUrl;
         server = new ServerFacade(serverUrl);
         this.authToken = authToken;
-        this.messageObserver = observer;
     }
 
     public String getAuthToken() {
@@ -99,10 +96,6 @@ public class PostLoginClient implements Client {
 
                 storeCurrentGameData(gameID);
 
-                //Make WebSocket Connection
-                websocket = new WebSocketFacade(serverUrl, messageObserver);
-                websocket.connect(authToken, gameID);
-
                 return String.format("Joined game %s as team %s\n", gameID, playerColor);
             } catch (NumberFormatException e) {
                 throw new DataAccessException("Error: passed ID is not a number");
@@ -117,10 +110,6 @@ public class PostLoginClient implements Client {
             try {
                 Integer gameID = Integer.valueOf(params[0]);
                 storeCurrentGameData(gameID);
-
-                //Make WebSocket Connection
-                websocket = new WebSocketFacade(serverUrl, messageObserver);
-                websocket.connect(authToken, gameID);
 
                 return String.format("Observing game %s\n", gameID);
             } catch (NumberFormatException e) {

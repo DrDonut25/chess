@@ -11,7 +11,7 @@ import java.util.Stack;
 
 import static ui.EscapeSequences.*;
 
-public class Repl implements ServerMessageObserver {
+public class Repl {
     private final Stack<Client> clientStack;
     private final String serverUrl;
 
@@ -50,7 +50,7 @@ public class Repl implements ServerMessageObserver {
         //Order of Clients: Login, PostLogin, Game. Pop when moving left and push when moving right
         if (client instanceof LoginClient) {
             if (result.startsWith("Logged in") || result.startsWith("Registered")) {
-                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken(), this));
+                clientStack.push(new PostLoginClient(serverUrl, client.getAuthToken()));
             }
         } else if (client instanceof PostLoginClient) {
             if (result.startsWith("Logged out")) {
@@ -58,47 +58,20 @@ public class Repl implements ServerMessageObserver {
             } else if (result.startsWith("Joined")) {
                 GameData game = ((PostLoginClient) client).getGameData();
                 if (result.contains("WHITE")) {
-                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false, true));
+                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, false, true));
                 } else {
-                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false, false));
+                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, false, false));
 
                 }
             } else if (result.startsWith("Observing")) {
                 GameData game = ((PostLoginClient) client).getGameData();
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, true, true));
+                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, true, true));
             }
         } else if (client instanceof GameClient) {
             if (result.startsWith("Resigned") || result.startsWith("Left")) {
                 clientStack.pop();
             }
         }
-    }
-
-    @Override
-    public void notify(ServerMessage message) {
-        switch (message.getServerMessageType()) {
-            case NOTIFICATION -> displayNotification((NotificationMessage) message);
-            case ERROR -> displayError((ErrorMessage) message);
-            case LOAD_GAME -> loadGame((LoadGameMessage) message);
-        }
-        printPrompt();
-    }
-
-    @Override
-    public void displayNotification(NotificationMessage notification) {
-        System.out.println(SET_TEXT_COLOR_YELLOW + notification.getMessage());
-    }
-
-    @Override
-    public void displayError(ErrorMessage errorMessage) {
-        System.out.println(SET_TEXT_COLOR_RED + errorMessage.getMessage());
-    }
-
-    @Override
-    public void loadGame(LoadGameMessage gameMessage) {
-        GameData gameData = gameMessage.getGame();
-        ChessGame game = gameData.game();
-        BoardSketcher.drawBoard(gameMessage.isWhiteOriented(), game);
     }
 
     private void printPrompt() {

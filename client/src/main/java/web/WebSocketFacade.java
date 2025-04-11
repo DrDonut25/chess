@@ -5,7 +5,10 @@ import com.google.gson.Gson;
 import exception.DataAccessException;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
+import websocket.messages.ServerMessage;
 
 import javax.websocket.ContainerProvider;
 import javax.websocket.MessageHandler;
@@ -28,8 +31,18 @@ public class WebSocketFacade {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    NotificationMessage notification = new Gson().fromJson(message, NotificationMessage.class);
-                    messageObserver.notify(notification);
+                    var gson = new Gson();
+                    ServerMessage serverMessage = gson.fromJson(message, ServerMessage.class);
+                    if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.NOTIFICATION) {
+                        NotificationMessage notification = gson.fromJson(message, NotificationMessage.class);
+                        messageObserver.notify(notification);
+                    } else if (serverMessage.getServerMessageType() == ServerMessage.ServerMessageType.ERROR) {
+                        ErrorMessage errorMessage = gson.fromJson(message, ErrorMessage.class);
+                        messageObserver.notify(errorMessage);
+                    } else {
+                        LoadGameMessage loadGameMessage = gson.fromJson(message, LoadGameMessage.class);
+                        messageObserver.notify(loadGameMessage);
+                    }
                 }
             });
         } catch (Exception e) {

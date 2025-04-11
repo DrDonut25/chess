@@ -31,7 +31,7 @@ public class WebSocketHandler {
             String username = getUsername(gameCommand.getAuthToken());
             switch (gameCommand.getCommandType()) {
                 case CONNECT -> connect(session, username, gameCommand);
-                case MAKE_MOVE -> makeMove(session, username, (MakeMoveCommand) gameCommand);
+                case MAKE_MOVE -> makeMove(session, username, new Gson().fromJson(msg, MakeMoveCommand.class));
                 case LEAVE -> leaveGame(session, username, gameCommand);
                 case RESIGN -> resign(session, username, gameCommand);
             }
