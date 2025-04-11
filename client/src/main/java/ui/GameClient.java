@@ -81,7 +81,6 @@ public class GameClient implements Client, ServerMessageObserver {
 
     public String makeMove(String[] params) throws DataAccessException {
         //Call makeMove method in WebSocketFacade — ensure input is valid
-        //Check if move is legal too? Or is that for WebSocketHandler?
         if (params.length == 2) {
             String startPos = params[0];
             String endPos = params[1];

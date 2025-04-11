@@ -81,9 +81,24 @@ public class WebSocketHandler {
         String startPos = pos1.toCoordString();
         String endPos = pos2.toCoordString();
         Integer gameID = command.getGameID();
-        //Make sure move is valid-- Call makeMove in Phase 1 code
+
+        //Get GameData
         GameData gameData = gameService.getGame(gameID);
         ChessGame game = gameData.game();
+        //Prevent observers or out of turn players from making a move
+        ChessGame.TeamColor teamTurn = game.getTeamTurn();
+        if (gameData.whiteUsername().equals(username)) {
+            if (teamTurn != ChessGame.TeamColor.WHITE) {
+                throw new DataAccessException("Error: It is not white's turn to make a move");
+            }
+        } else if (gameData.blackUsername().equals(username)) {
+            if (teamTurn != ChessGame.TeamColor.BLACK) {
+                throw new DataAccessException("Error: It is not black's turn to make a move");
+            }
+        } else {
+            throw new DataAccessException("Error: Observers cannot make moves");
+        }
+        //Make sure move is valid-- Call makeMove in Phase 1 code
         try {
             game.makeMove(move);
         } catch (InvalidMoveException e) {

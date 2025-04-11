@@ -74,6 +74,10 @@ public class ChessGame {
         }
         Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
         ArrayList<ChessMove> valMoves = new ArrayList<>();
+        //Check if game is over (user has resigned). If so, return empty set of valid moves
+        if (gameOver) {
+            return valMoves;
+        }
         //Check if team is in check. If in check, see if current piece can protect the king
         //check if the piece moving will expose the king to check
         for (ChessMove move: moves) {
