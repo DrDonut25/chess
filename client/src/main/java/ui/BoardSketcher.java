@@ -54,6 +54,10 @@ public class BoardSketcher {
         return sb.toString();
     }
 
+    public static String drawLegalMoves(boolean isWhiteOriented, ChessGame game, ChessPosition position) {
+        return "";
+    }
+
     private static void printPiece(StringBuilder sb, ChessBoard board, int row, int col) {
         ChessPiece piece = board.getPiece(new ChessPosition(row, col));
         if (piece == null) {

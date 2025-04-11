@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessMove;
+import chess.ChessPosition;
 import exception.DataAccessException;
 import model.GameData;
 import web.ServerMessageObserver;
@@ -67,18 +69,63 @@ public class GameClient implements Client {
     }
 
     public String makeMove(String[] params) throws DataAccessException {
-        //Call makeMove method in WebSocketFacade
-        //Update ChessGame to reflect the move you just made (also WebSocketFacade?)
-        //Broadcast to all players/observers that you made a move (also WebSocketFacade?)
-        //Redraw updated board?
-        return "";
+        //Call makeMove method in WebSocketFacade — ensure input is valid
+        //Check if move is legal too? Or is that for WebSocketHandler?
+        if (params.length == 2) {
+            String startPos = params[0];
+            String endPos = params[1];
+            ChessMove move = new ChessMove(toChessPosition(startPos), toChessPosition(endPos));
+            websocket.makeMove(move, authToken, gameData.gameID());
+            return String.format("Moved piece at %s to %s", startPos, endPos);
+        } else {
+            throw new DataAccessException("Error: invalid number of arguments — expected <START_POSITION> <END_POSITION>");
+        }
+    }
+
+    private ChessPosition toChessPosition(String letterCoord) throws DataAccessException {
+        letterCoord = letterCoord.toLowerCase();
+        if (letterCoord.length() == 2) {
+            int col;
+            int row;
+            if (letterCoord.charAt(0) == 'a') {
+                col = 1;
+            } else if (letterCoord.charAt(0) == 'b') {
+                col = 2;
+            } else if (letterCoord.charAt(0) == 'c') {
+                col = 3;
+            } else if (letterCoord.charAt(0) == 'd') {
+                col = 4;
+            } else if (letterCoord.charAt(0) == 'e') {
+                col = 5;
+            } else if (letterCoord.charAt(0) == 'f') {
+                col = 6;
+            } else if (letterCoord.charAt(0) == 'g') {
+                col = 7;
+            } else if (letterCoord.charAt(0) == 'h') {
+                col = 8;
+            } else {
+                throw new DataAccessException("Error: invalid column letter — must be between a and h");
+            }
+            if (Character.isDigit(letterCoord.charAt(1))) {
+                row = Character.getNumericValue(letterCoord.charAt(1));
+            } else {
+                throw new DataAccessException("Error: invalid row number — must be between 1 and 8");
+            }
+            return new ChessPosition(row, col);
+        } else {
+            throw new DataAccessException("Error: invalid position format — enter position in letter-number form (e.g. B6)");
+        }
     }
 
     public String legalMoves(String[] params) throws DataAccessException {
+        if (params.length == 1) {
+            String position = params[0];
+            return BoardSketcher.drawLegalMoves(isWhiteOriented, gameData.game(), toChessPosition(position));
+        } else {
+            throw new DataAccessException("Error: invalid number of arguments — expected <POSITION>");
+        }
         //Maybe create additional method in BoardSketcher class that handles printing board with highlighted tiles
-        //Create Collection of ChessPositions that are valid positions to move to, then pass to BoardSketcher class ^
-
-        return "";
+        //Create Collection of ChessPositions that are valid positions to move to, then pass to BoardSketcher class?
     }
 
     public String resign() throws DataAccessException {
