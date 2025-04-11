@@ -12,7 +12,6 @@ public interface GameDAO {
     boolean colorIsTaken(String playerColor, Integer gameID) throws DataAccessException;
     Collection<GameData> listGames() throws DataAccessException;
     void updateGame(Integer gameID, String playerColor, String username) throws DataAccessException;
-    void deletePlayer(Integer gameID, String playerColor, String username) throws DataAccessException;
     void updateBoard(Integer gameID, ChessGame game) throws DataAccessException;
     void clear() throws DataAccessException;
 }

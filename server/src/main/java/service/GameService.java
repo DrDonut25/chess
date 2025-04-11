@@ -87,10 +87,6 @@ public class GameService {
         gameDAO.updateGame(gameID, playerColor, username);
     }
 
-    public void deletePlayer(Integer gameID, String playerColor, String username) throws DataAccessException {
-        gameDAO.deletePlayer(gameID, playerColor, username);
-    }
-
     public void updateBoard(Integer gameID, ChessGame game) throws DataAccessException {
         gameDAO.updateBoard(gameID, game);
     }

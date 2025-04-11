@@ -11,6 +11,8 @@ import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import static java.sql.Types.NULL;
+
 public class SQLGameDAO implements GameDAO {
     public SQLGameDAO() throws DataAccessException {
         this.configureDatabase();
@@ -79,16 +81,6 @@ public class SQLGameDAO implements GameDAO {
         }
     }
 
-    public void deletePlayer(Integer gameID, String playerColor, String username) throws DataAccessException {
-        if (playerColor.equals("WHITE")) {
-            var statement = "DELETE FROM game WHERE white_username=?";
-            executeUpdate(statement, username);
-        } else {
-            var statement = "DELETE FROM game WHERE black_username=?";
-            executeUpdate(statement, username);
-        }
-    }
-
     @Override
     public void updateBoard(Integer gameID, ChessGame game) throws DataAccessException {
         var statement = "UPDATE game SET game=? WHERE id=?";
@@ -139,6 +131,9 @@ public class SQLGameDAO implements GameDAO {
                     }
                     else if (param instanceof String p) {
                         ps.setString(i + 1, p);
+                    }
+                    else if (param == null) {
+                        ps.setNull(i + 1, NULL);
                     }
                 }
                 ps.executeUpdate();

@@ -147,9 +147,9 @@ public class WebSocketHandler {
             //Remove user from ChessGame (if client is observer, do nothing
             Integer gameID = command.getGameID();
             GameData gameData = gameService.getGame(gameID);
-            if (gameData.whiteUsername().equals(username)) {
-                gameService.deletePlayer(gameID, "WHITE", null);
-            } else if (gameData.blackUsername().equals(username)) {
+            if (gameData.whiteUsername() != null && gameData.whiteUsername().equals(username)) {
+                gameService.updateGame(gameID, "WHITE", null);
+            } else if (gameData.blackUsername() != null && gameData.blackUsername().equals(username)) {
                 gameService.updateGame(gameID, "BLACK", null);
             }
             //Remove client's connection from ConnectionManager
