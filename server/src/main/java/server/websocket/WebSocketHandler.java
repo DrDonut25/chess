@@ -5,17 +5,12 @@ import dataaccess.AuthDAO;
 import dataaccess.GameDAO;
 import exception.DataAccessException;
 import model.GameData;
-import org.eclipse.jetty.util.IO;
-import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.*;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
-import websocket.messages.ErrorMessage;
-import websocket.messages.NotificationMessage;
-import websocket.messages.ServerMessage;
+import websocket.messages.*;
 
-import javax.imageio.IIOException;
 import java.io.IOException;
 
 @WebSocket
@@ -31,7 +26,6 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String msg) throws IOException {
-
         try {
             UserGameCommand gameCommand = new Gson().fromJson(msg, UserGameCommand.class);
             String username = getUsername(gameCommand.getAuthToken());
@@ -52,12 +46,20 @@ public class WebSocketHandler {
 
     public void connect(Session session, String username, UserGameCommand command) throws DataAccessException {
         try {
+            //Notify other clients that user joined the game
             connections.add(username, session);
             String message = username + " joined the game";
             NotificationMessage notification = new NotificationMessage(message);
             connections.broadcast(username, notification);
-            //Observer code?
 
+            //Get GameData
+            Integer gameID = command.getGameID();
+            GameData gameData = gameDAO.getGame(gameID);
+            //Figure out board orientation
+            boolean isWhiteOriented = !gameData.blackUsername().equals(username);
+            //Create/send LoadGameMessage back to messaging client
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
+            session.getRemote().sendString(new Gson().toJson(loadGameMessage));
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -72,19 +74,33 @@ public class WebSocketHandler {
         //Notify user if in check
     }
 
-    public void leaveGame(Session session, String username, UserGameCommand command) throws IOException {
-        connections.remove(username);
-        String message = username + " left the game";
-        NotificationMessage notification = new NotificationMessage(message);
-        connections.broadcast(username, notification);
-        //Remove user from ChessGame
+    public void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException {
+        try {
+            //Remove user from ChessGame (if client is observer, do nothing
+            Integer gameID = command.getGameID();
+            GameData gameData = gameDAO.getGame(gameID);
+            if (gameData.whiteUsername().equals(username)) {
+                gameDAO.updateGame(gameID, "WHITE", null);
+            } else if (gameData.blackUsername().equals(username)) {
+                gameDAO.updateGame(gameID, "BLACK", null);
+            }
+
+            //Remove client's connection from ConnectionManager
+            connections.remove(username);
+            //Notify other clients that user left the game
+            String message = username + " left the game";
+            NotificationMessage notification = new NotificationMessage(message);
+            connections.broadcast(username, notification);
+        } catch (IOException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
     public void resign(Session session, String username, UserGameCommand command) throws IOException {
         String message = username + " forfeited the game";
         NotificationMessage notification = new NotificationMessage(message);
         connections.broadcast(username, notification);
-        //Remove user from ChessGame and end ChessGame
+        //End ChessGame—do NOT remove the resigning user
 
     }
 }

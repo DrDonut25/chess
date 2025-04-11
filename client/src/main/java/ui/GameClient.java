@@ -14,25 +14,16 @@ public class GameClient implements Client {
     private final boolean isObserving;
     private boolean isWhiteOriented;
 
-    public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing) throws DataAccessException {
+    public GameClient(String url, String auth, GameData game, ServerMessageObserver observer, boolean observing, boolean isWhite) throws DataAccessException {
         this.authToken = auth;
         this.gameData = game;
         this.isObserving = observing;
-        setBoardOrientation();
+        this.isWhiteOriented = isWhite;
         websocket = new WebSocketFacade(url, observer);
     }
 
     public String getAuthToken() {
         return authToken;
-    }
-
-    private void setBoardOrientation() {
-        isWhiteOriented = true;
-        if (!isObserving) {
-            //Find if player is on black team --> set isWhiteOriented to false
-
-            isWhiteOriented = false;
-        }
     }
 
     @Override

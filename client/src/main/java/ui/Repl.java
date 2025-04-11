@@ -57,10 +57,15 @@ public class Repl implements ServerMessageObserver {
                 clientStack.pop();
             } else if (result.startsWith("Joined")) {
                 GameData game = ((PostLoginClient) client).getGameData();
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false));
+                if (result.contains("WHITE")) {
+                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false, true));
+                } else {
+                    clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, false, false));
+
+                }
             } else if (result.startsWith("Observing")) {
                 GameData game = ((PostLoginClient) client).getGameData();
-                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, true));
+                clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, this, true, true));
             }
         } else if (client instanceof GameClient) {
             if (result.startsWith("Resigned") || result.startsWith("Left")) {
