@@ -19,7 +19,7 @@ import java.io.IOException;
 
 @WebSocket
 public class WebSocketHandler {
-    private ConnectionManager connections = new ConnectionManager();
+    private final ConnectionManager connections = new ConnectionManager();
     private final AuthDAO authDAO;
     private final GameDAO gameDAO;
 
@@ -36,8 +36,8 @@ public class WebSocketHandler {
             switch (gameCommand.getCommandType()) {
                 case CONNECT -> connect(session, username, gameCommand);
                 case MAKE_MOVE -> makeMove(session, username, new Gson().fromJson(msg, MakeMoveCommand.class));
-                case LEAVE -> leaveGame(session, username, gameCommand);
-                case RESIGN -> resign(session, username, gameCommand);
+                case LEAVE -> leaveGame(username, gameCommand);
+                case RESIGN -> resign(username, gameCommand);
             }
         } catch (DataAccessException e) {
             session.getRemote().sendString("Error: Unauthorized");
@@ -86,17 +86,44 @@ public class WebSocketHandler {
             throw new DataAccessException(e.getMessage());
         }
         //Update ChessGame
-
-        //Send LoadGameMessage to ALL clients
-
-        //Send NotificationMessage to all OTHER clients spelling out what move was made
-        String message = String.format("%s made a move: %s to %s", username, startPos, endPos);
-
-        //Notify ALL clients if in check/checkmate/stalemate
-
+        gameDAO.updateBoard(gameID, game);
+        //Figure out boardOrientation
+        boolean isWhiteOriented = !gameData.blackUsername().equals(username);
+        //Send relevant ServerMessages
+        try {
+            //Send LoadGameMessage to ALL clients
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
+            session.getRemote().sendString(new Gson().toJson(loadGameMessage));
+            connections.broadcast(username, loadGameMessage);
+            //Send NotificationMessage to all OTHER clients spelling out what move was made
+            String moveMessage = String.format("%s made a move: %s to %s", username, startPos, endPos);
+            NotificationMessage moveNotif = new NotificationMessage(moveMessage);
+            connections.broadcast(username, moveNotif);
+            //Notify ALL clients if in check/checkmate/stalemate
+            if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                notifyCheckMessage("White is in check!");
+            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                notifyCheckMessage("Black is in check!");
+            } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                notifyCheckMessage("Checkmate! Black wins!");
+            } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                notifyCheckMessage("Checkmate! White wins!");
+            } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                notifyCheckMessage("Stalemate! Black wins!");
+            } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                notifyCheckMessage("Stalemate! White wins!");
+            }
+        } catch (IOException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 
-    public void leaveGame(Session session, String username, UserGameCommand command) throws DataAccessException {
+    private void notifyCheckMessage(String message) throws IOException {
+        NotificationMessage checkNotification = new NotificationMessage(message);
+        connections.broadcast(null, checkNotification);
+    }
+
+    public void leaveGame(String username, UserGameCommand command) throws DataAccessException {
         try {
             //Remove user from ChessGame (if client is observer, do nothing
             Integer gameID = command.getGameID();
@@ -118,12 +145,19 @@ public class WebSocketHandler {
         }
     }
 
-    public void resign(Session session, String username, UserGameCommand command) throws IOException {
+    public void resign(String username, UserGameCommand command) throws DataAccessException {
         //End ChessGame—do NOT remove the resigning user
-
-        //Notify ALL clients that game has been forfeited
-        String message = username + " forfeited the game";
-        NotificationMessage notification = new NotificationMessage(message);
-        connections.broadcast(username, notification);
+        Integer gameID = command.getGameID();
+        ChessGame game = gameDAO.getGame(gameID).game();
+        game.resign();
+        gameDAO.updateBoard(gameID, game);
+        try {
+            //Notify ALL clients that game has been forfeited
+            String message = username + " forfeited the game!";
+            NotificationMessage notification = new NotificationMessage(message);
+            connections.broadcast(null, notification);
+        } catch (IOException e) {
+            throw new DataAccessException(e.getMessage());
+        }
     }
 }
