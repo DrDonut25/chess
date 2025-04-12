@@ -58,7 +58,6 @@ public class Repl {
                     clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, false, true));
                 } else {
                     clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, false, false));
-
                 }
             } else if (result.startsWith("Observing")) {
                 GameData game = ((PostLoginClient) client).getGameData();
