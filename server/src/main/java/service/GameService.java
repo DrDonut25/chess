@@ -19,7 +19,7 @@ public class GameService {
 
     public ListGameResult listGames(String authToken) {
         try {
-            if (getAuth(authToken) == null) {
+            if (authDAO.getAuth(authToken) == null) {
                 return new ListGameResult(null, "Error: unauthorized");
             }
             return new ListGameResult(gameDAO.listGames(), null);
@@ -33,7 +33,7 @@ public class GameService {
             if (createGameRequest.authToken() == null || createGameRequest.gameName() == null) {
                 return new CreateGameResult(null, "Error: bad request");
             }
-            if (getAuth(createGameRequest.authToken()) == null) {
+            if (authDAO.getAuth(createGameRequest.authToken()) == null) {
                 return new CreateGameResult(null, "Error: unauthorized");
             }
             Integer gameID = gameDAO.createGame(createGameRequest.gameName());
@@ -50,17 +50,17 @@ public class GameService {
             if (playerColor == null || gameID == null) {
                 return new JoinGameResult("Error: bad request");
             }
-            if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || getGame(gameID) == null) {
+            if ((!playerColor.equals("WHITE") && !playerColor.equals("BLACK")) || gameDAO.getGame(gameID) == null) {
                 return new JoinGameResult("Error: bad request");
             }
-            if (getAuth(joinGameRequest.authToken()) == null) {
+            if (authDAO.getAuth(joinGameRequest.authToken()) == null) {
                 return new JoinGameResult("Error: unauthorized");
             }
             if (gameDAO.colorIsTaken(playerColor, gameID)) {
                 return new JoinGameResult("Error: already taken");
             }
-            String username = getAuth(joinGameRequest.authToken()).username();
-            updateGame(gameID, playerColor, username);
+            String username = authDAO.getAuth(joinGameRequest.authToken()).username();
+            gameDAO.updateGame(gameID, playerColor, username);
             return new JoinGameResult("");
         } catch (DataAccessException e) {
             return new JoinGameResult("Error: Data Access Exception");

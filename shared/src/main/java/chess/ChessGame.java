@@ -190,6 +190,9 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         //like checkmate, but is conditional on king not being in check
+        if (gameOver) {
+            return false;
+        }
         if (this.isInCheck(teamColor)) {
             return false;
         } else {
