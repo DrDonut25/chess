@@ -63,11 +63,11 @@ public class WebSocketHandler {
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
             //Add user to Connection Map
-            connections.add(username, session);
+            connections.add(gameID, username, session);
             //Notify all OTHER clients that user joined the game
             String message = username + " joined the game";
             NotificationMessage notification = new NotificationMessage(message);
-            connections.broadcast(username, notification);
+            connections.broadcast(username, gameID, notification);
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -113,33 +113,33 @@ public class WebSocketHandler {
             //Send LoadGameMessage to ALL clients
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-            connections.broadcast(username, loadGameMessage);
+            connections.broadcast(username, gameID, loadGameMessage);
             //Send NotificationMessage to all OTHER clients spelling out what move was made
             String moveMessage = String.format("%s made a move: %s to %s", username, startPos, endPos);
             NotificationMessage moveNotif = new NotificationMessage(moveMessage);
-            connections.broadcast(username, moveNotif);
+            connections.broadcast(username, gameID, moveNotif);
             //Notify ALL clients if in check/checkmate/stalemate
             if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("White is in check!");
+                notifyCheckMessage("White is in check!", gameID);
             } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Black is in check!");
+                notifyCheckMessage("Black is in check!", gameID);
             } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("Checkmate! Black wins!");
+                notifyCheckMessage("Checkmate! Black wins!", gameID);
             } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Checkmate! White wins!");
+                notifyCheckMessage("Checkmate! White wins!", gameID);
             } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("Stalemate! Black wins!");
+                notifyCheckMessage("Stalemate! Black wins!", gameID);
             } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Stalemate! White wins!");
+                notifyCheckMessage("Stalemate! White wins!", gameID);
             }
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }
     }
 
-    private void notifyCheckMessage(String message) throws IOException {
+    private void notifyCheckMessage(String message, Integer gameID) throws IOException {
         NotificationMessage checkNotification = new NotificationMessage(message);
-        connections.broadcast(null, checkNotification);
+        connections.broadcast(null, gameID, checkNotification);
     }
 
     public void leaveGame(String username, UserGameCommand command) throws DataAccessException {
@@ -158,7 +158,7 @@ public class WebSocketHandler {
             //Notify other clients that user left the game
             String message = username + " left the game";
             NotificationMessage notification = new NotificationMessage(message);
-            connections.broadcast(username, notification);
+            connections.broadcast(username, gameID, notification);
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }
@@ -184,7 +184,7 @@ public class WebSocketHandler {
             //Notify ALL clients that game has been forfeited
             String message = username + " forfeited the game!";
             NotificationMessage notification = new NotificationMessage(message);
-            connections.broadcast(null, notification);
+            connections.broadcast(null, gameID, notification);
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());
         }

@@ -5,13 +5,15 @@ import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
     private ConcurrentHashMap<String, Connection> connections = new ConcurrentHashMap<>();
 
-    public void add(String username, Session session) {
-        Connection connection  = new Connection(username, session);
+    public void add(Integer gameID, String username, Session session) {
+        Connection connection = new Connection(username, gameID, session);
         connections.put(username, connection);
     }
 
@@ -19,12 +21,14 @@ public class ConnectionManager {
         connections.remove(username);
     }
 
-    public void broadcast(String excludeUsername, ServerMessage message) throws IOException {
+    public void broadcast(String excludeUsername, Integer gameID, ServerMessage message) throws IOException {
         ArrayList<Connection> removeList = new ArrayList<>();
         for (Connection connection: connections.values()) {
             if (connection.session.isOpen()) {
                 if (!connection.username.equals(excludeUsername)) {
-                    connection.send(message.toString());
+                    if (Objects.equals(connection.gameID, gameID)) {
+                        connection.send(message.toString());
+                    }
                 }
             } else {
                 removeList.add(connection);
