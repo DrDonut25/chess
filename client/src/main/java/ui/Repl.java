@@ -23,6 +23,7 @@ public class Repl {
         String result = "";
         //exit program if "quit" is typed in at any time, otherwise continue running Repl loop
         while (!result.equals("quit")) {
+            System.out.print(SET_TEXT_COLOR_BLUE);
             Client client = clientStack.peek();
             printPrompt();
             String line = scanner.nextLine();

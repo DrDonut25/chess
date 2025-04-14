@@ -10,14 +10,11 @@ import websocket.messages.LoadGameMessage;
 import websocket.messages.NotificationMessage;
 import websocket.messages.ServerMessage;
 
-import javax.websocket.ContainerProvider;
-import javax.websocket.MessageHandler;
-import javax.websocket.Session;
-import javax.websocket.WebSocketContainer;
+import javax.websocket.*;
 import java.io.IOException;
 import java.net.URI;
 
-public class WebSocketFacade {
+public class WebSocketFacade extends Endpoint {
     private final Session session;
     private final ServerMessageObserver messageObserver;
 
@@ -48,6 +45,10 @@ public class WebSocketFacade {
         } catch (Exception e) {
             throw new DataAccessException(e.getMessage());
         }
+    }
+
+    @Override
+    public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
     public void connect(String authToken, Integer gameID) throws DataAccessException {
