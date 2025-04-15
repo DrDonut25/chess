@@ -57,8 +57,6 @@ public class WebSocketHandler {
             //Get GameData
             Integer gameID = command.getGameID();
             GameData gameData = gameService.getGame(gameID);
-            //Figure out board orientation
-            boolean isWhiteOriented = !gameData.blackUsername().equals(username);
             //Create/send LoadGameMessage back to messaging client
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
@@ -106,8 +104,6 @@ public class WebSocketHandler {
         }
         //Update ChessGame
         gameService.updateBoard(gameID, game);
-        //Figure out boardOrientation
-        boolean isWhiteOriented = !gameData.blackUsername().equals(username);
         //Send relevant ServerMessages
         try {
             //Send LoadGameMessage to ALL clients
