@@ -2,6 +2,7 @@ package ui;
 
 import chess.ChessGame;
 import chess.ChessMove;
+import chess.ChessPiece;
 import chess.ChessPosition;
 import exception.DataAccessException;
 import model.GameData;
@@ -25,6 +26,8 @@ public class GameClient implements Client, ServerMessageObserver {
     private final boolean isObserving;
     private final boolean isWhiteOriented;
     private boolean aboutToResign = false;
+    private boolean aboutToPromote = false;
+    private ChessMove nextMove = null;
 
     public GameClient(String url, String auth, GameData game, boolean observing, boolean isWhite) throws DataAccessException {
         this.authToken = auth;
@@ -46,17 +49,26 @@ public class GameClient implements Client, ServerMessageObserver {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            if (!isObserving && !aboutToResign) {
+            if (!isObserving && !aboutToResign && !aboutToPromote) {
                 return switch (cmd) {
                     case "redraw" -> redraw();
                     case "leave" -> leave();
-                    case "make_move" -> makeMove(params);
+                    case "make_move" -> checkForPromoMove(params);
                     case "legal_moves" -> legalMoves(params);
                     case "resign" -> verifyResign();
                     case "quit" -> "Exiting program";
                     default -> help();
                 };
-            } else if (!isObserving) {
+            } else if (!isObserving && !aboutToResign) {
+                return switch(cmd) {
+                    case "queen" -> makePromoteQueenMove();
+                    case "bishop" -> makePromoteBishopMove();
+                    case "rook" -> makePromoteRookMove();
+                    case "knight" -> makePromoteKnightMove();
+                    default -> help();
+                };
+            }
+            else if (!isObserving) {
                 return switch (cmd) {
                     case "Y" -> resign();
                     case "N" -> "Resuming game.\n" + help();
@@ -88,17 +100,56 @@ public class GameClient implements Client, ServerMessageObserver {
         return String.format("Left game %d", gameData.gameID());
     }
 
-    public String makeMove(String[] params) throws DataAccessException {
+    public String checkForPromoMove(String[] params) throws DataAccessException {
         //Call makeMove method in WebSocketFacade — ensure input is valid
         if (params.length == 2) {
             String startPos = params[0];
             String endPos = params[1];
-            ChessMove move = new ChessMove(toChessPosition(startPos), toChessPosition(endPos));
-            websocket.makeMove(move, authToken, gameData.gameID());
-            return String.format("Moved piece at %s to %s\n", startPos, endPos) + redraw();
+            nextMove = new ChessMove(toChessPosition(startPos), toChessPosition(endPos));
+            //Check if move can promote a pawn
+            if (canPromote(nextMove)) {
+                aboutToPromote = true;
+                return "Your move can promote your pawn! Which piece do you want to promote it to? Type \"help\" to view your options.";
+            } else {
+                return makeMove(nextMove);
+            }
         } else {
             throw new DataAccessException("Error: invalid number of arguments — expected <START_POSITION> <END_POSITION>");
         }
+    }
+
+    private String makePromoteQueenMove() throws DataAccessException {
+        ChessMove promoMove = new ChessMove(nextMove.getStartPosition(), nextMove.getEndPosition(), ChessPiece.PieceType.QUEEN);
+        nullifyPromoVariables();
+        return makeMove(promoMove);
+    }
+
+    private String makePromoteBishopMove() throws DataAccessException {
+        ChessMove promoMove = new ChessMove(nextMove.getStartPosition(), nextMove.getEndPosition(), ChessPiece.PieceType.BISHOP);
+        nullifyPromoVariables();
+        return makeMove(promoMove);
+    }
+
+    private String makePromoteRookMove() throws DataAccessException {
+        ChessMove promoMove = new ChessMove(nextMove.getStartPosition(), nextMove.getEndPosition(), ChessPiece.PieceType.ROOK);
+        nullifyPromoVariables();
+        return makeMove(promoMove);
+    }
+
+    private String makePromoteKnightMove() throws DataAccessException {
+        ChessMove promoMove = new ChessMove(nextMove.getStartPosition(), nextMove.getEndPosition(), ChessPiece.PieceType.KNIGHT);
+        nullifyPromoVariables();
+        return makeMove(promoMove);
+    }
+
+    private String makeMove(ChessMove move) throws DataAccessException {
+        websocket.makeMove(move, authToken, gameData.gameID());
+        return String.format("Moved piece at %s to %s\n", move.getStartPosition(), move.getEndPosition()) + redraw();
+    }
+
+    private void nullifyPromoVariables() {
+        nextMove = null;
+        aboutToPromote = false;
     }
 
     private ChessPosition toChessPosition(String letterCoord) throws DataAccessException {
@@ -136,6 +187,17 @@ public class GameClient implements Client, ServerMessageObserver {
         }
     }
 
+    private boolean canPromote(ChessMove move) {
+        ChessGame game = gameData.game();
+        Collection<ChessMove> validMoves = game.validMoves(move.getStartPosition());
+        for (ChessMove validMove: validMoves) {
+            if (validMove.getPromotionPiece() != null && move.getEndPosition().equals(validMove.getEndPosition())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public String legalMoves(String[] params) throws DataAccessException {
         if (params.length == 1) {
             ChessPosition position = toChessPosition(params[0]);
@@ -162,7 +224,7 @@ public class GameClient implements Client, ServerMessageObserver {
 
     @Override
     public String help() {
-        if (!isObserving) {
+        if (!isObserving && !aboutToPromote) {
             return """
                 redraw - draw current game board
                 leave - leave current game
@@ -172,6 +234,13 @@ public class GameClient implements Client, ServerMessageObserver {
                 quit - exit program
                 help - list possible commands
                 """;
+        } else if (!isObserving) {
+            return """
+                    queen - promote pawn to queen
+                    bishop - promote pawn to bishop
+                    rook - promote pawn to rook
+                    knight - promote pawn to knight
+                    """;
         } else {
             return """
                 redraw - draw current game board
