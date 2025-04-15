@@ -60,7 +60,7 @@ public class WebSocketHandler {
             //Figure out board orientation
             boolean isWhiteOriented = !gameData.blackUsername().equals(username);
             //Create/send LoadGameMessage back to messaging client
-            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
             //Add user to Connection Map
             connections.add(gameID, username, session);
@@ -111,7 +111,7 @@ public class WebSocketHandler {
         //Send relevant ServerMessages
         try {
             //Send LoadGameMessage to ALL clients
-            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData, isWhiteOriented);
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
             connections.broadcast(username, gameID, loadGameMessage);
             //Send NotificationMessage to all OTHER clients spelling out what move was made

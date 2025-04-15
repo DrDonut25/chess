@@ -191,6 +191,6 @@ public class GameClient implements Client, ServerMessageObserver {
         GameData gameData = gameMessage.getGame();
         this.gameData = gameData;
         ChessGame game = gameData.game();
-        BoardSketcher.drawBoard(gameMessage.isWhiteOriented(), game, null);
+        BoardSketcher.drawBoard(isWhiteOriented, game, null);
     }
 }

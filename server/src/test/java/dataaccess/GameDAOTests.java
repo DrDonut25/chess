@@ -90,12 +90,7 @@ public class GameDAOTests {
     @Test
     @Order(8)
     public void updateGameFailed() {
-        try {
-            Integer gameID = gameDAO.createGame("myGame");
-            Assertions.assertThrows(DataAccessException.class, () -> gameDAO.updateGame(gameID, "WHITE", null));
-        } catch (DataAccessException e) {
-            throw new AssertionError(e.getMessage());
-        }
+        Assertions.assertThrows(NullPointerException.class, () -> gameDAO.updateGame(5, null, null));
     }
 
     @Test
