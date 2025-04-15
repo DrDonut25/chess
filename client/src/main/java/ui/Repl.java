@@ -65,7 +65,7 @@ public class Repl {
                 clientStack.push(new GameClient(serverUrl, client.getAuthToken(), game, true, true));
             }
         } else if (client instanceof GameClient) {
-            if (result.startsWith("Resigned") || result.startsWith("Left")) {
+            if (result.startsWith("Left")) {
                 clientStack.pop();
             }
         }

@@ -104,12 +104,13 @@ public class WebSocketHandler {
         }
         //Update ChessGame
         gameService.updateBoard(gameID, game);
+        gameData = new GameData(gameID, gameData.whiteUsername(), gameData.blackUsername(), gameData.gameName(), game);
         //Send relevant ServerMessages
         try {
             //Send LoadGameMessage to ALL clients
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData);
             session.getRemote().sendString(new Gson().toJson(loadGameMessage));
-            connections.broadcast(username, gameID, loadGameMessage);
+            connections.broadcast(null, gameID, loadGameMessage);
             //Send NotificationMessage to all OTHER clients spelling out what move was made
             String moveMessage = String.format("%s made a move: %s to %s", username, startPos, endPos);
             NotificationMessage moveNotif = new NotificationMessage(moveMessage);
@@ -124,6 +125,10 @@ public class WebSocketHandler {
                     notifyCheckMessage(String.format("Stalemate! %s wins!", gameData.blackUsername()), gameID);
                 } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
                     notifyCheckMessage(String.format("Stalemate! %s wins!", username), gameID);
+                } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("%s is in check!", username), gameID);
+                } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("%s is in check!", username), gameID);
                 }
             } else {
                 if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
@@ -134,12 +139,11 @@ public class WebSocketHandler {
                     notifyCheckMessage(String.format("Stalemate! %s wins!", username), gameID);
                 } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
                     notifyCheckMessage(String.format("Stalemate! %s wins!", gameData.whiteUsername()), gameID);
+                } else if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("%s is in check!", username), gameID);
+                } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("%s is in check!", username), gameID);
                 }
-            }
-            if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage(String.format("%s is in check!", username), gameID);
-            } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage(String.format("%s is in check!", username), gameID);
             }
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());

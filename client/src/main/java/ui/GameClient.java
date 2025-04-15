@@ -67,11 +67,10 @@ public class GameClient implements Client, ServerMessageObserver {
                     case "knight" -> makePromoteKnightMove();
                     default -> help();
                 };
-            }
-            else if (!isObserving) {
+            } else if (!isObserving) {
                 return switch (cmd) {
-                    case "Y" -> resign();
-                    case "N" -> "Resuming game.\n" + help();
+                    case "y" -> resign();
+                    case "n" -> "Resuming game.\n";
                     default -> verifyResign();
                 };
             }
@@ -144,7 +143,7 @@ public class GameClient implements Client, ServerMessageObserver {
 
     private String makeMove(ChessMove move) throws DataAccessException {
         websocket.makeMove(move, authToken, gameData.gameID());
-        return String.format("Moved piece at %s to %s\n", move.getStartPosition(), move.getEndPosition()) + redraw();
+        return String.format("Moved piece at %s to %s\n", move.getStartPosition(), move.getEndPosition());
     }
 
     private void nullifyPromoVariables() {
@@ -218,6 +217,7 @@ public class GameClient implements Client, ServerMessageObserver {
     private String resign() throws DataAccessException {
         //End game. Consider adding gameOver boolean to ChessGame class
         //Do above step in WebSocketFacade?
+        aboutToResign = false;
         websocket.resign(authToken, gameData.gameID());
         return "Resigned the game. You lose!";
     }
@@ -276,6 +276,6 @@ public class GameClient implements Client, ServerMessageObserver {
         GameData gameData = gameMessage.getGame();
         this.gameData = gameData;
         ChessGame game = gameData.game();
-        BoardSketcher.drawBoard(isWhiteOriented, game, null);
+        System.out.println("\n" + BoardSketcher.drawBoard(isWhiteOriented, game, null));
     }
 }
