@@ -35,7 +35,7 @@ public class BoardSketcher {
             sb.append(columnLabels).append(resetColors).append(newLine);
         } else {
             //Add top column label
-            String columnText = " h\u2003 g\u2003 f\u2003 e\u2003 d\u2003 b\u2003 c\u2003 a";
+            String columnText = " h\u2003 g\u2003 f\u2003 e\u2003 d\u2003 c\u2003 b\u2003 a";
             String columnLabels = labelFont + EscapeSequences.EMPTY + columnText + "    ";
             sb.append(columnLabels).append(newLine);
             //Add rows
