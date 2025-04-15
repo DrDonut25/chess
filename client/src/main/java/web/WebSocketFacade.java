@@ -79,6 +79,8 @@ public class WebSocketFacade extends Endpoint {
         }
     }
 
+
+
     public void resign(String authToken, Integer gameID) throws DataAccessException {
         try {
             UserGameCommand resignCommand = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameID);

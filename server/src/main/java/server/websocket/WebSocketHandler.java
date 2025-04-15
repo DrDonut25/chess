@@ -115,18 +115,31 @@ public class WebSocketHandler {
             NotificationMessage moveNotif = new NotificationMessage(moveMessage);
             connections.broadcast(username, gameID, moveNotif);
             //Notify ALL clients if in check/checkmate/stalemate
+            if (gameData.whiteUsername().equals(username)) {
+                if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("Checkmate! %s wins!", gameData.blackUsername()), gameID);
+                } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("Checkmate! %s wins!", username), gameID);
+                } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("Stalemate! %s wins!", gameData.blackUsername()), gameID);
+                } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("Stalemate! %s wins!", username), gameID);
+                }
+            } else {
+                if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("Checkmate! %s wins!", username), gameID);
+                } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("Checkmate! %s wins!", gameData.whiteUsername()), gameID);
+                } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                    notifyCheckMessage(String.format("Stalemate! %s wins!", username), gameID);
+                } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                    notifyCheckMessage(String.format("Stalemate! %s wins!", gameData.whiteUsername()), gameID);
+                }
+            }
             if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("White is in check!", gameID);
+                notifyCheckMessage(String.format("%s is in check!", username), gameID);
             } else if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Black is in check!", gameID);
-            } else if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("Checkmate! Black wins!", gameID);
-            } else if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Checkmate! White wins!", gameID);
-            } else if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
-                notifyCheckMessage("Stalemate! Black wins!", gameID);
-            } else if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
-                notifyCheckMessage("Stalemate! White wins!", gameID);
+                notifyCheckMessage(String.format("%s is in check!", username), gameID);
             }
         } catch (IOException e) {
             throw new DataAccessException(e.getMessage());

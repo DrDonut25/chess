@@ -44,7 +44,7 @@ public class BoardSketcher {
                 sb.append(labelFont).append(" ").append(String.format("%d ", row));
                 for (int col = 1; col <= 8; col++) {
                     //Set tile color
-                    setTileColor(sb, row, col, legalMoves);
+                    setTileColor(sb, row, 9 - col, legalMoves);
                     //Print tile contents
                     printPiece(sb, board, row, 9 - col);
                 }

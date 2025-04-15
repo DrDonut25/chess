@@ -24,6 +24,7 @@ public class GameClient implements Client, ServerMessageObserver {
     private GameData gameData;
     private final boolean isObserving;
     private final boolean isWhiteOriented;
+    private boolean aboutToResign = false;
 
     public GameClient(String url, String auth, GameData game, boolean observing, boolean isWhite) throws DataAccessException {
         this.authToken = auth;
@@ -45,20 +46,28 @@ public class GameClient implements Client, ServerMessageObserver {
             String[] tokens = input.toLowerCase().split(" ");
             String cmd = (tokens.length > 0) ? tokens[0] : "help";
             String[] params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            if (!isObserving) {
+            if (!isObserving && !aboutToResign) {
                 return switch (cmd) {
                     case "redraw" -> redraw();
                     case "leave" -> leave();
                     case "make_move" -> makeMove(params);
                     case "legal_moves" -> legalMoves(params);
-                    case "resign" -> resign();
+                    case "resign" -> verifyResign();
                     case "quit" -> "Exiting program";
                     default -> help();
                 };
-            } else {
+            } else if (!isObserving) {
+                return switch (cmd) {
+                    case "Y" -> resign();
+                    case "N" -> "Resuming game.\n" + help();
+                    default -> verifyResign();
+                };
+            }
+            else {
                 return switch (cmd) {
                     case "redraw" -> redraw();
                     case "leave" -> leave();
+                    case "legal_moves" -> legalMoves(params);
                     case "quit" -> "Exiting program";
                     default -> help();
                 };
@@ -86,7 +95,7 @@ public class GameClient implements Client, ServerMessageObserver {
             String endPos = params[1];
             ChessMove move = new ChessMove(toChessPosition(startPos), toChessPosition(endPos));
             websocket.makeMove(move, authToken, gameData.gameID());
-            return String.format("Moved piece at %s to %s", startPos, endPos);
+            return String.format("Moved piece at %s to %s\n", startPos, endPos) + redraw();
         } else {
             throw new DataAccessException("Error: invalid number of arguments — expected <START_POSITION> <END_POSITION>");
         }
@@ -98,53 +107,21 @@ public class GameClient implements Client, ServerMessageObserver {
             int col;
             int row;
             if (letterCoord.charAt(0) == 'a') {
-                if (isWhiteOriented) {
-                    col = 1;
-                } else {
-                    col = 8;
-                }
+                col = 1;
             } else if (letterCoord.charAt(0) == 'b') {
-                if (isWhiteOriented) {
-                    col = 2;
-                } else {
-                    col = 7;
-                }
+                col = 2;
             } else if (letterCoord.charAt(0) == 'c') {
-                if (isWhiteOriented) {
-                    col = 3;
-                } else {
-                    col = 6;
-                }
+                col = 3;
             } else if (letterCoord.charAt(0) == 'd') {
-                if (isWhiteOriented) {
-                    col = 4;
-                } else {
-                    col = 5;
-                }
+                col = 4;
             } else if (letterCoord.charAt(0) == 'e') {
-                if (isWhiteOriented) {
-                    col = 5;
-                } else {
-                    col = 4;
-                }
+                col = 5;
             } else if (letterCoord.charAt(0) == 'f') {
-                if (isWhiteOriented) {
-                    col = 6;
-                } else {
-                    col = 3;
-                }
+                col = 6;
             } else if (letterCoord.charAt(0) == 'g') {
-                if (isWhiteOriented) {
-                    col = 7;
-                } else {
-                    col = 2;
-                }
+                col = 7;
             } else if (letterCoord.charAt(0) == 'h') {
-                if (isWhiteOriented) {
-                    col = 8;
-                } else {
-                    col = 1;
-                }
+                col = 8;
             } else {
                 throw new DataAccessException("Error: invalid column letter — must be between a and h");
             }
@@ -170,7 +147,13 @@ public class GameClient implements Client, ServerMessageObserver {
         }
     }
 
-    public String resign() throws DataAccessException {
+
+    public String verifyResign() {
+        aboutToResign = true;
+        return "Are you sure you want to forfeit? Y/N";
+    }
+
+    private String resign() throws DataAccessException {
         //End game. Consider adding gameOver boolean to ChessGame class
         //Do above step in WebSocketFacade?
         websocket.resign(authToken, gameData.gameID());
@@ -193,6 +176,7 @@ public class GameClient implements Client, ServerMessageObserver {
             return """
                 redraw - draw current game board
                 leave - stop observing current game
+                legal_moves <POSITION> - highlights legal moves at specified position
                 quit - exit program
                 help - list possible commands
                 """;
