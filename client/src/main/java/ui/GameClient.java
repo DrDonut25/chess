@@ -98,21 +98,53 @@ public class GameClient implements Client, ServerMessageObserver {
             int col;
             int row;
             if (letterCoord.charAt(0) == 'a') {
-                col = 1;
+                if (isWhiteOriented) {
+                    col = 1;
+                } else {
+                    col = 8;
+                }
             } else if (letterCoord.charAt(0) == 'b') {
-                col = 2;
+                if (isWhiteOriented) {
+                    col = 2;
+                } else {
+                    col = 7;
+                }
             } else if (letterCoord.charAt(0) == 'c') {
-                col = 3;
+                if (isWhiteOriented) {
+                    col = 3;
+                } else {
+                    col = 6;
+                }
             } else if (letterCoord.charAt(0) == 'd') {
-                col = 4;
+                if (isWhiteOriented) {
+                    col = 4;
+                } else {
+                    col = 5;
+                }
             } else if (letterCoord.charAt(0) == 'e') {
-                col = 5;
+                if (isWhiteOriented) {
+                    col = 5;
+                } else {
+                    col = 4;
+                }
             } else if (letterCoord.charAt(0) == 'f') {
-                col = 6;
+                if (isWhiteOriented) {
+                    col = 6;
+                } else {
+                    col = 3;
+                }
             } else if (letterCoord.charAt(0) == 'g') {
-                col = 7;
+                if (isWhiteOriented) {
+                    col = 7;
+                } else {
+                    col = 2;
+                }
             } else if (letterCoord.charAt(0) == 'h') {
-                col = 8;
+                if (isWhiteOriented) {
+                    col = 8;
+                } else {
+                    col = 1;
+                }
             } else {
                 throw new DataAccessException("Error: invalid column letter — must be between a and h");
             }
